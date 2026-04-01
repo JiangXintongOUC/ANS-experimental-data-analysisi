@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>ANS × 运动干预追踪报告 — JiangXintong</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg: #f7f6f2;
+  --bg2: #eeecea;
+  --bg3: #e4e1dc;
+  --ink: #1a1916;
+  --ink2: #5a5752;
+  --ink3: #9a9590;
+  --line: rgba(26,25,22,0.12);
+  --green: #2d7a4f;
+  --green-l: #e8f5ee;
+  --green-m: #6ab98a;
+  --amber: #b5620a;
+  --amber-l: #fdf0e0;
+  --red: #b52828;
+  --red-l: #fce8e8;
+  --blue: #1a5fa8;
+  --blue-l: #e5eef9;
+  --purple: #6b3fa0;
+  --purple-l: #f0eaf9;
+  --teal: #1a7a6e;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 32px 80px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 48px;
+  border-bottom: 1.5px solid var(--ink);
+  padding-bottom: 24px;
+}
+.header-left {}
+.header-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .12em;
+  color: var(--ink3);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+h1 {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -.02em;
+  line-height: 1.15;
+}
+h1 span { color: var(--green); }
+.header-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--ink3);
+  text-align: right;
+  line-height: 1.8;
+}
+
+/* Section titles */
+.section-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 0.5px;
+  background: var(--line);
+}
+section { margin-bottom: 40px; }
+
+/* KPI cards */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+.kpi {
+  background: white;
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+.kpi-label { font-size: 11px; color: var(--ink3); margin-bottom: 4px; }
+.kpi-value { font-size: 22px; font-weight: 600; letter-spacing: -.02em; line-height: 1; }
+.kpi-sub { font-size: 11px; color: var(--ink3); margin-top: 5px; }
+.kpi-value.good { color: var(--green); }
+.kpi-value.warn { color: var(--amber); }
+.kpi-value.bad { color: var(--red); }
+
+/* Alert box */
+.alert {
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 12.5px;
+  line-height: 1.7;
+  margin-bottom: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.alert.green { background: var(--green-l); border-left: 3px solid var(--green); }
+.alert.red { background: var(--red-l); border-left: 3px solid var(--red); }
+.alert.amber { background: var(--amber-l); border-left: 3px solid var(--amber); }
+.alert strong { font-weight: 600; }
+
+/* Calendar heatmap */
+.cal-wrap { display: flex; gap: 32px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+.cal-month {}
+.cal-month-name {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink2);
+  margin-bottom: 10px;
+}
+.cal-dow-row {
+  display: grid;
+  grid-template-columns: repeat(7, 32px);
+  gap: 3px;
+  margin-bottom: 3px;
+}
+.cal-dow {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  text-align: center;
+  color: var(--ink3);
+  letter-spacing: .05em;
+}
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 32px);
+  gap: 3px;
+}
+.cal-cell {
+  width: 32px;
+  height: 32px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  cursor: default;
+  position: relative;
+  transition: transform .1s;
+}
+.cal-cell:hover { transform: scale(1.15); z-index: 10; }
+.cal-empty { background: transparent; }
+.cal-future { background: var(--bg2); color: var(--ink3); }
+.cal-miss { background: var(--bg3); color: var(--ink3); }
+.c-ex35 { background: #2d7a4f; color: #e8f5ee; }
+.c-25 { background: #6ab98a; color: #1a4030; }
+.c-15 { background: #f5c06a; color: #5a3a00; }
+.c-lo { background: #e06060; color: #fff; }
+.ring-pilates { outline: 2.5px solid #1a5fa8; outline-offset: 1px; }
+.ring-crash { outline: 2.5px solid #b52828; outline-offset: 1px; }
+.ring-squash { outline: 2.5px solid #b5620a; outline-offset: 1px; }
+.ring-feld { outline: 2.5px solid #2d7a4f; outline-offset: 2px; }
+.ring-fascia { outline: 2.5px solid #6b3fa0; outline-offset: 1px; }
+.ring-group { outline: 2.5px solid #f5a623; outline-offset: 1px; }
+.ring-massage { outline: 2.5px solid #d4537e; outline-offset: 1px; }
+.ring-newpeak { outline: 3px solid #1a1916; outline-offset: 1px; }
+
+.cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 14px;
+}
+.leg-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--ink2);
+}
+.leg-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* Chart container */
+.chart-box {
+  background: white;
+  border: 0.5px solid var(--line);
+  border-radius: 10px;
+  padding: 20px 24px;
+}
+.chart-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.ctab {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 0.5px solid var(--line);
+  background: transparent;
+  color: var(--ink2);
+  font-family: 'DM Sans', sans-serif;
+  transition: all .15s;
+}
+.ctab:hover { background: var(--bg2); }
+.ctab.active { background: var(--ink); color: white; border-color: var(--ink); }
+.chart-canvas-wrap { position: relative; height: 260px; }
+
+/* Exercise comparison table */
+.ex-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.ex-card {
+  background: white;
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+}
+.ex-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ex-card-title .ex-name { font-size: 13px; }
+.ex-card-title .ex-date { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ink3); font-weight: 400; }
+.ex-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--ink2);
+  padding: 2px 0;
+}
+.ex-row .val { font-weight: 500; color: var(--ink); }
+.ex-divider { height: 0.5px; background: var(--line); margin: 8px 0; }
+.ex-effect {
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 6px;
+}
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .02em;
+}
+.badge-green { background: var(--green-l); color: var(--green); }
+.badge-amber { background: var(--amber-l); color: var(--amber); }
+.badge-red { background: var(--red-l); color: var(--red); }
+.badge-blue { background: var(--blue-l); color: var(--blue); }
+.badge-purple { background: var(--purple-l); color: var(--purple); }
+
+/* Bar visual */
+.bar-row { margin: 6px 0; }
+.bar-label { font-size: 10px; color: var(--ink3); margin-bottom: 2px; display: flex; justify-content: space-between; }
+.bar-track { height: 6px; background: var(--bg2); border-radius: 3px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 3px; }
+
+/* Data table */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.data-table th {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  text-align: right;
+  padding: 8px 8px;
+  border-bottom: 1px solid var(--line);
+  font-weight: 500;
+}
+.data-table th:first-child, .data-table th:nth-child(2) { text-align: left; }
+.data-table td {
+  padding: 7px 8px;
+  text-align: right;
+  border-bottom: 0.5px solid var(--line);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+}
+.data-table td:first-child, .data-table td:nth-child(2) { text-align: left; font-family: 'DM Sans', sans-serif; }
+.data-table tr:hover td { background: var(--bg2); }
+.data-table .row-crash td { background: rgba(181,40,40,.05); }
+.data-table .row-peak td { background: rgba(45,122,79,.08); }
+.data-table .row-ex td { background: rgba(26,95,168,.04); }
+td.good { color: var(--green); font-weight: 500; }
+td.bad { color: var(--red); }
+td.warn { color: var(--amber); }
+
+/* Findings */
+.findings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.finding-card {
+  background: white;
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+}
+.finding-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 32px;
+  font-weight: 300;
+  color: var(--bg3);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.finding-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.finding-body { font-size: 12px; color: var(--ink2); line-height: 1.7; }
+
+/* Footer */
+.footer {
+  margin-top: 56px;
+  padding-top: 20px;
+  border-top: 0.5px solid var(--line);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--ink3);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Tooltip */
+.cal-cell[title] { cursor: help; }
+
+/* Tooltip */
+.cal-cell[title] { cursor: help; }
+
+/* ── WeChat / Mobile optimizations ── */
+@media (max-width: 768px) {
+  .page { padding: 20px 14px 60px; }
+
+  /* Header stacked */
+  .header { flex-direction: column; gap: 12px; margin-bottom: 28px; padding-bottom: 16px; }
+  .header-meta { text-align: left; font-size: 10px; }
+  h1 { font-size: 20px; }
+
+  /* KPI: 2 cols on mobile */
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .kpi { padding: 12px; }
+  .kpi-value { font-size: 20px; }
+  .kpi-label, .kpi-sub { font-size: 10px; }
+
+  /* Alert boxes: comfortable on narrow screens */
+  .alert { font-size: 12px; padding: 12px 13px; gap: 8px; }
+  .alert-icon { font-size: 14px; }
+
+  /* Calendar: shrink cells, allow scroll */
+  .cal-wrap { gap: 16px; }
+  .cal-cell { width: 26px; height: 26px; font-size: 9px; border-radius: 4px; }
+  .cal-dow-row { grid-template-columns: repeat(7, 26px); }
+  .cal-grid { grid-template-columns: repeat(7, 26px); gap: 2px; }
+  .cal-legend { gap: 10px; }
+  .leg-item { font-size: 10px; }
+  .leg-swatch { width: 12px; height: 12px; }
+
+  /* Chart tabs: scrollable row */
+  .chart-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; gap: 4px; }
+  .ctab { font-size: 11px; padding: 4px 10px; white-space: nowrap; flex-shrink: 0; }
+  .chart-canvas-wrap { height: 220px; }
+
+  /* Exercise grid: 1 col on phone */
+  .ex-grid { grid-template-columns: 1fr; gap: 8px; }
+  .ex-card { padding: 12px; }
+  .ex-card-title .ex-name { font-size: 12px; }
+
+  /* Data table: horizontal scroll */
+  .data-table { font-size: 10px; }
+  .data-table th { font-size: 8px; padding: 6px 5px; }
+  .data-table td { padding: 5px; font-size: 10px; }
+
+  /* Findings: single column */
+  .findings-grid { grid-template-columns: 1fr; gap: 8px; }
+  .finding-card { padding: 14px; }
+  .finding-num { font-size: 26px; }
+  .finding-title { font-size: 12px; }
+  .finding-body { font-size: 11px; }
+
+  /* Footer */
+  .footer { flex-direction: column; gap: 4px; font-size: 9px; }
+
+  section { margin-bottom: 28px; }
+
+  /* Bar chart in SNS comparison */
+  .bar-label { font-size: 10px; }
+}
+
+/* Extra narrow (older phones, WeChat mini) */
+@media (max-width: 390px) {
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .cal-cell { width: 22px; height: 22px; font-size: 8px; }
+  .cal-dow-row { grid-template-columns: repeat(7, 22px); }
+  .cal-grid { grid-template-columns: repeat(7, 22px); gap: 2px; }
+}
+</style>
+
+<!-- WeChat sharing meta tags -->
+<meta property="og:title" content="ANS Resilience 实验报告 — JiangXintong">
+<meta property="og:description" content="自主神经系统 × 运动干预追踪 · 37天 · 12次干预 · 2026.02.24—03.30">
+<meta property="og:type" content="website">
+
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-tag">自主神经系统 × 运动干预追踪报告</div>
+      <h1>ANS <span>Resilience</span> 实验<br>JiangXintong</h1>
+    </div>
+    <div class="header-meta">
+      Female / 33y / 158cm / 60kg<br>
+      设备：Polar H10 + Kubios HRV<br>
+      观测期：2026.02.24 — 03.30<br>
+      正位测试：37天 · 运动干预：12次<br>
+      生成：2026.04.01
+    </div>
+  </div>
+
+  <!-- KPI -->
+  <section>
+    <div class="section-title">核心指标总览</div>
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-label">全实验 RMSSD 峰值</div>
+        <div class="kpi-value good">56.4</div>
+        <div class="kpi-sub">ms · 3/26 按摩超补偿D+3</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">基线均值 RMSSD</div>
+        <div class="kpi-value">37.6</div>
+        <div class="kpi-sub">ms · 全期平均（含感冒期）</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">迷走增益基线</div>
+        <div class="kpi-value warn">8.5</div>
+        <div class="kpi-sub">bpm 深呼吸HR反应 · 正常&gt;11</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">最大单日崩落</div>
+        <div class="kpi-value bad">−29.6</div>
+        <div class="kpi-sub">ms · 3/13 P03超阈值⚠</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Feldenkrais训练中SNS</div>
+        <div class="kpi-value good">0.07</div>
+        <div class="kpi-sub">唯一ANS中性运动 · 壁球7.21</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key alerts -->
+  <section>
+    <div class="section-title">关键事件</div>
+    <div class="alert green">
+      <div class="alert-icon">★</div>
+      <div><strong>P02普拉提（3/8上午）→ 次日+8.3ms</strong>：TRIMP 43.7 / MaxHR 122bpm，迄今最优单次运动效应。强度刚好落在阈值以内，产生了显著的迷走神经适应性提升，次日（3/9）RMSSD 46.8ms首次以运动方式突破自然峰值46.1ms。</div>
+    </div>
+    <div class="alert red">
+      <div class="alert-icon">⚠</div>
+      <div><strong>P03普拉提（3/12傍晚）→ 次日−29.6ms</strong>：TRIMP 41.0（低于P02），但MaxHR达139bpm（首现Hard区间1.4%），超过强度阈值（估计125–130bpm）。在全实验最高晨测状态（54.2ms）下发生交感过激，次日产生最大崩落。验证了"高基线ANS ≠ 可承受高强度"的核心假设。</div>
+    </div>
+    <div class="alert amber">
+      <div class="alert-icon">⚠</div>
+      <div><strong>心理应激否决机制（3/19晚）</strong>：F01 Feldenkrais + P05轻量普拉提完成后，当晚极度焦虑导致睡眠极差，3/20–3/22连续三天ANS低值（23–29ms）。F01/P05的正向适应效应被心理应激从下游完全覆盖，是"应激否决机制"的活体验证。</div>
+    </div>
+    <div class="alert green">
+      <div class="alert-icon">◆</div>
+      <div><strong>按摩超补偿（3/23晚→3/26峰）</strong>：英式芳香按摩后72小时出现RMSSD 56.4ms（实验总峰值），远超即时效应。深层软组织放松触发的迷走神经回张存在典型的48–72h延迟，3/26晨测是实验中迄今最高单日副交感张力记录，PNS +1.68，LF/HF 0.316，DFA α1 0.766。</div>
+    </div>
+    <div class="alert red">
+      <div class="alert-icon">⚠</div>
+      <div><strong>感冒叠加P06（3/28发病→3/29训练）</strong>：3/28感冒，消炎药介入，次日晨测出现三重异常信号（RMSSD 32.2ms↓、DFA α1 1.154>1.0过度规则化、LF/HF 0.996≈1.0交感偏高）。在红灯状态下完成72.3 TRIMP / VT1以上5.7%的P06，3/30进一步跌至28.8ms。P06数据标记为感冒混杂，不纳入干预效果分析。</div>
+    </div>
+    <div class="alert amber">
+      <div class="alert-icon">◈</div>
+      <div><strong>F2 vs F3：相同技术，不同底层状态，不同结局</strong>：两次费登奎斯均将HR从85–87 bpm降至59–60 bpm（↓约27 bpm），即时下调效应一致。但F2（健康基线56.4ms）结束后HR回至68、PNS恢复至-0.53；F3（感冒恢复+低RMSSD 28.8ms）结束后HR反弹至83、PNS跌回-1.68。说明费登奎斯的副交感维持效应高度依赖ANS储备，储备耗尽时即时平静无法延续至课后。</div>
+    </div>
+    <div class="alert green">
+      <div class="alert-icon">◆</div>
+      <div><strong>壁球悖论（3/14）</strong>：TRIMP 185.8（P02的4.3倍）/ MaxHR 166bpm / VT1以上21.8%，但次日RMSSD仅跌5ms。壁球的间歇式结构（高强度冲刺→短暂换气→再冲刺）在极高总负荷下对ANS的实际抑制远小于持续强度峰值的P03。揭示：TRIMP与次日ANS状态不相关，MaxHR和运动结构才是决定因素。</div>
+    </div>
+  </section>
+
+  <!-- Calendar heatmap -->
+  <section>
+    <div class="section-title">日历热图 — 静卧 RMSSD（ms）</div>
+    <div id="cal-container"></div>
+    <div class="cal-legend">
+      <div class="leg-item"><div class="leg-swatch" style="background:#2d7a4f"></div>&gt;35ms 优秀</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#6ab98a"></div>25–35ms 良好</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#f5c06a"></div>15–25ms 一般</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#e06060"></div>&lt;15ms 偏低</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#e4e1dc"></div>缺失/无测</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#2d7a4f;outline:2.5px solid #1a5fa8;outline-offset:1px"></div>私教日</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#2d7a4f;outline:2.5px solid #2d7a4f;outline-offset:2px"></div>Feldenkrais</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#f5c06a;outline:2.5px solid #b5620a;outline-offset:1px"></div>壁球日</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#6ab98a;outline:2.5px solid #d4537e;outline-offset:1px"></div>按摩日</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#e06060;outline:2.5px solid #b52828;outline-offset:1px"></div>⚠崩落/感冒</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#2d7a4f;outline:3px solid #1a1916;outline-offset:1px"></div>全实验峰值</div>
+    </div>
+  </section>
+
+  <!-- Charts -->
+  <section>
+    <div class="section-title">趋势分析</div>
+    <div class="chart-box">
+      <div class="chart-tabs">
+        <button class="ctab active" onclick="switchChart('rmssd',this)">RMSSD 趋势</button>
+        <button class="ctab" onclick="switchChart('pns',this)">PNS / SNS index</button>
+        <button class="ctab" onclick="switchChart('ortho',this)">直立反应 ΔHR</button>
+        <button class="ctab" onclick="switchChart('dose',this)">强度 × 效应</button>
+      </div>
+      <div class="chart-canvas-wrap"><canvas id="mainChart"></canvas></div>
+    </div>
+  </section>
+
+  <!-- Exercise comparison -->
+  <section>
+    <div class="section-title">运动干预档案对比</div>
+    <div class="ex-grid">
+
+      <div class="ex-card">
+        <div class="ex-card-title" style="border-bottom:2px solid #6ab98a">
+          <span class="ex-name">P01 普拉提私教</span>
+          <span class="ex-date">3/5 傍晚</span>
+        </div>
+        <div class="ex-row"><span>TRIMP</span><span class="val">30.5</span></div>
+        <div class="ex-row"><span>均值 HR</span><span class="val">85 bpm</span></div>
+        <div class="ex-row"><span>Max HR</span><span class="val">117 bpm</span></div>
+        <div class="ex-row"><span>Hard+ 区间</span><span class="val">0%</span></div>
+        <div class="ex-row"><span>VT1 以上</span><span class="val">0%</span></div>
+        <div class="ex-divider"></div>
+        <div class="ex-row"><span>次日 ΔRMSSD</span><span class="val" style="color:var(--green)">+0.9 ms</span></div>
+        <div style="margin-top:6px"><span class="badge badge-green">轻微改善</span></div>
+      </div>
+
+      <div class="ex-card" style="border-color:#2d7a4f;border-width:1.5px">
+        <div class="ex-card-title" style="border-bottom:2.5px solid #2d7a4f">
+          <span class="ex-name">P02 普拉提私教 ★</span>
+          <span class="ex-date">3/8 上午</span>
+        </div>
+        <div class="ex-row"><span>TRIMP</span><span class="val" style="color:var(--green)">43.7</span></div>
+        <div class="ex-row"><span>均值 HR</span><span class="val">93 bpm</span></div>
+        <div class="ex-row"><span>Max HR</span><span class="val">122 bpm</span></div>
+        <div class="ex-row"><span>Hard+ 区间</span><span class="val">0%</span></div>
+        <div class="ex-row"><span>VT1 以上</span><span class="val">0%</span></div>
+        <div class="ex-divider"></div>
+        <div class="ex-row"><span>次日 ΔRMSSD</span><span class="val" style="color:var(--green);font-size:14px">+8.3 ms</span></div>
+        <div style="margin-top:6px"><span class="badge badge-green">最佳效应 ★</span></div>
+      </div>
+
+      <div class="ex-card" style="border-color:#b52828;border-width:1.5px">
+        <div class="ex-card-title" style="border-bottom:2.5px solid #b52828">
+          <span class="ex-name">P03 普拉提私教 ⚠</span>
+          <span class="ex-date">3/12 傍晚</span>
+        </div>
+        <div class="ex-row"><span>TRIMP</span><span class="val">41.0</span></div>
+        <div class="ex-row"><span>均值 HR</span><span class="val">86 bpm</span></div>
+        <div class="ex-row"><span>Max HR</span><span class="val" style="color:var(--red)">139 bpm ⚠</span></div>
+        <div class="ex-row"><span>Hard+ 区间</span><span class="val" style="color:var(--red)">1.6% 首现</span></div>
+        <div class="ex-row"><span>VT1 以上</span><span class="val" style="color:var(--red)">3.1%</span></div>
+        <div class="ex-divider"></div>
+        <div class="ex-row"><span>次日 ΔRMSSD</span><span class="val" style="color:var(--red);font-size:14px">−29.6 ms</span></div>
+        <div style="margin-top:6px"><span class="badge badge-red">超阈值抑制 ⚠</span></div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-card-title" style="border-bottom:2px solid #b5620a">
+          <span class="ex-name">S01 壁球</span>
+          <span class="ex-date">3/14 下午</span>
+        </div>
+        <div class="ex-row"><span>TRIMP</span><span class="val" style="color:var(--amber)">185.8 ↑↑</span></div>
+        <div class="ex-row"><span>均值 HR</span><span class="val">113 bpm</span></div>
+        <div class="ex-row"><span>Max HR</span><span class="val" style="color:var(--red)">166 bpm</span></div>
+        <div class="ex-row"><span>Hard+ 区间</span><span class="val">13.9%</span></div>
+        <div class="ex-row"><span>VT1 以上</span><span class="val">21.8%</span></div>
+        <div class="ex-divider"></div>
+        <div class="ex-row"><span>次日 ΔRMSSD</span><span class="val" style="color:var(--amber)">−5.0 ms</span></div>
+        <div style="margin-top:6px"><span class="badge badge-amber">悖论：仅轻跌</span></div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-card-title" style="border-bottom:2px solid #2d7a4f">
+          <span class="ex-name">F01 Feldenkrais ★</span>
+          <span class="ex-date">3/18 晚</span>
+        </div>
+        <div class="ex-row"><span>训练中 SNS</span><span class="val" style="color:var(--green)">0.07 ★</span></div>
+        <div class="ex-row"><span>均值 HR</span><span class="val">63.6 bpm</span></div>
+        <div class="ex-row"><span>训练前 SNS</span><span class="val">0.82</span></div>
+        <div class="ex-row"><span>训练后 SNS</span><span class="val" style="color:var(--amber)">1.38</span></div>
+        <div class="ex-row"><span>Hard+ 区间</span><span class="val">0%</span></div>
+        <div class="ex-divider"></div>
+        <div class="ex-row"><span>课中ANS状态</span><span class="val" style="color:var(--green)">中性最优</span></div>
+        <div style="margin-top:6px"><span class="badge badge-green">副交感主导运动</span></div>
+      </div>
+
+      <div class="ex-card" style="border-color:#d4537e;border-width:1.5px">
+        <div class="ex-card-title" style="border-bottom:2px solid #d4537e">
+          <span class="ex-name">英式芳香按摩 ★★</span>
+          <span class="ex-date">3/23 晚</span>
+        </div>
+        <div class="ex-row"><span>进入时 RMSSD</span><span class="val">47.0 ms</span></div>
+        <div class="ex-row"><span>D+1 RMSSD</span><span class="val">47.3 ms</span></div>
+        <div class="ex-row"><span>D+2 RMSSD</span><span class="val">44.3 ms</span></div>
+        <div class="ex-row"><span>D+3 峰值</span><span class="val" style="color:var(--green);font-size:14px;font-weight:600">56.4 ms ★★</span></div>
+        <div class="ex-divider"></div>
+        <div class="ex-row"><span>峰值延迟</span><span class="val" style="color:var(--green)">72h</span></div>
+        <div style="margin-top:6px"><span class="badge badge-purple">超补偿 D+3</span></div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-card-title" style="border-bottom:2px solid #2d7a4f">
+          <span class="ex-name">F02 Feldenkrais</span>
+          <span class="ex-date">3/26 傍晚</span>
+        </div>
+        <div class="ex-row"><span>进入 HR</span><span class="val" style="color:var(--red)">85 bpm</span></div>
+        <div class="ex-row"><span>训练中 HR</span><span class="val" style="color:var(--green)">60 bpm ↓25</span></div>
+        <div class="ex-row"><span>训练后 HR</span><span class="val" style="color:var(--amber)">68 bpm</span></div>
+        <div class="ex-row"><span>PNS变化</span><span class="val">−1.40→+0.18</span></div>
+        <div class="ex-row"><span>晨测RMSSD</span><span class="val" style="color:var(--green)">56.4ms 🟢</span></div>
+        <div class="ex-divider"></div>
+        <div class="ex-row"><span>次日 ΔRMSSD</span><span class="val" style="color:var(--amber)">−9.6 ms</span></div>
+        <div style="margin-top:6px"><span class="badge badge-amber">高储备进入 · 正常回落</span></div>
+      </div>
+
+      <div class="ex-card" style="border-color:#b52828;border-width:1.5px">
+        <div class="ex-card-title" style="border-bottom:2.5px solid #b52828">
+          <span class="ex-name">P06 私教 ⚠ 感冒混杂</span>
+          <span class="ex-date">3/29 上午</span>
+        </div>
+        <div class="ex-row"><span>TRIMP</span><span class="val" style="color:var(--amber)">72.3</span></div>
+        <div class="ex-row"><span>均值 HR</span><span class="val">106 bpm</span></div>
+        <div class="ex-row"><span>Max HR</span><span class="val">131 bpm</span></div>
+        <div class="ex-row"><span>VT1–VT2</span><span class="val" style="color:var(--amber)">5.7%</span></div>
+        <div class="ex-row"><span>晨测RMSSD</span><span class="val" style="color:var(--red)">32.2ms 🔴</span></div>
+        <div class="ex-divider"></div>
+        <div class="ex-row"><span>次日 ΔRMSSD</span><span class="val" style="color:var(--red)">−3.4 ms</span></div>
+        <div style="margin-top:6px"><span class="badge badge-red">感冒混杂 · 数据无效</span></div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-card-title" style="border-bottom:2px solid #2d7a4f">
+          <span class="ex-name">F03 Feldenkrais</span>
+          <span class="ex-date">3/30 傍晚</span>
+        </div>
+        <div class="ex-row"><span>进入 HR</span><span class="val" style="color:var(--red)">87 bpm</span></div>
+        <div class="ex-row"><span>训练中 HR</span><span class="val" style="color:var(--green)">59 bpm ↓28</span></div>
+        <div class="ex-row"><span>训练后 HR</span><span class="val" style="color:var(--red)">83 bpm ↑</span></div>
+        <div class="ex-row"><span>DFA α1 课中均值</span><span class="val" style="color:var(--red)">1.26 ⚠</span></div>
+        <div class="ex-row"><span>晨测RMSSD</span><span class="val" style="color:var(--red)">28.8ms 🔴</span></div>
+        <div class="ex-divider"></div>
+        <div class="ex-row"><span>次日 ΔRMSSD</span><span class="val">待测</span></div>
+        <div style="margin-top:6px"><span class="badge badge-red">低储备 · 副交感无法维持</span></div>
+      </div>
+
+    </div>
+
+    <!-- SNS comparison bar -->
+    <div style="background:white;border:0.5px solid var(--line);border-radius:8px;padding:16px;margin-top:10px">
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:12px;font-family:'DM Mono',monospace;letter-spacing:.08em;text-transform:uppercase">训练中 SNS index 对比（越低=对ANS负担越小）</div>
+      <div class="bar-row">
+        <div class="bar-label"><span>Feldenkrais F01（健康）</span><span style="color:var(--green);font-weight:600">0.07 ★</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:.7%;background:#2d7a4f"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label"><span>Feldenkrais F02（高储备进入）</span><span style="color:var(--green)">−0.57</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:1%;background:#2d7a4f"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label"><span>Feldenkrais F03（低储备/感冒）</span><span style="color:var(--amber)">+0.45（训练后）</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:4.5%;background:#f5c06a"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label"><span>普拉提私教（P01–P05 课中均值估）</span><span>~0.5</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:5%;background:#6ab98a"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label"><span>团课 G01</span><span style="color:var(--amber)">1.81</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:18.1%;background:#f5c06a"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label"><span>壁球 S01</span><span style="color:var(--red)">7.21</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:72.1%;background:#e06060"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Data table -->
+  <section>
+    <div class="section-title">原始数据明细</div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>日期</th>
+            <th>干预</th>
+            <th>RMSSD卧</th>
+            <th>PNS卧</th>
+            <th>SNS卧</th>
+            <th>ΔHR立</th>
+            <th>SNS立</th>
+            <th>TRIMP</th>
+            <th>备注</th>
+          </tr>
+        </thead>
+        <tbody id="data-tbody"></tbody>
+      </table>
+    </div>
+    <div style="font-size:11px;color:var(--ink3);margin-top:8px;font-family:'DM Mono',monospace">
+      ⚠ 测时偏晚：3/7(09:43) 3/14(10:27) 3/16(10:32) 3/21(10:01)，RMSSD可能被低估约2–5ms。<br>
+      * 2/28数据来源ANS功能综合测试。静卧段标准2分钟（4月起延长至3分钟）。
+    </div>
+  </section>
+
+  <!-- Key findings -->
+  <section>
+    <div class="section-title">核心研究发现</div>
+    <div class="findings-grid">
+
+      <div class="finding-card">
+        <div class="finding-num">01</div>
+        <div class="finding-title">强度阈值而非总负荷决定次日ANS状态</div>
+        <div class="finding-body">TRIMP与次日RMSSD变化不相关（壁球TRIMP185.8仅抑制5ms，P03 TRIMP41却崩落29.6ms）。MaxHR和Hard区间占比是核心预测变量。当前估计个人阈值约在MaxHR 125–130bpm之间，超越则触发ANS抑制，低于则产生正向适应。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">02</div>
+        <div class="finding-title">间歇式运动结构对ANS的保护效应</div>
+        <div class="finding-body">壁球虽达到HRmax（166bpm），但其间歇式结构（冲刺→停顿→冲刺）使ANS在极高总负荷下仅产生轻度抑制（−5ms）。这支持假说：间歇结构在每次高强度段后提供小幅度迷走神经再激活机会，实际上是在训练vagal brake的快速切换能力，而非单纯消耗。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">03</div>
+        <div class="finding-title">Feldenkrais是唯一副交感主导运动方式</div>
+        <div class="finding-body">F01训练中SNS index仅0.07，接近ANS中性，是本实验所有运动类型中唯一不触发交感激活的训练。其机制是通过极慢的本体感受探索绕过防御性收缩，在副交感主导状态下完成神经动作模式的重塑。训练后SNS反弹至1.38属于正常振荡，不是负面信号。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">04</div>
+        <div class="finding-title">迷走增益不足（vagal brake受限）</div>
+        <div class="finding-body">2/28 ANS功能测试深呼吸HR反应仅8.5bpm（正常均值31±9bpm），低于11bpm阈值。这揭示迷走神经的可动员幅度受限——静息张力存在（晨测PNS可达+1.66），但在需要快速激活或快速恢复时增益不足。这与慢性工作压力下的长期交感高张力状态直接相关。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">05</div>
+        <div class="finding-title">"卧好立差"解离模式：压力感受器超敏</div>
+        <div class="finding-body">实验中出现5次"静卧RMSSD良好但站立SNS激剧增高"的解离现象（2/25、3/11、3/17、3/20、3/22），均发生在高负荷事件后的恢复期。提示：压力感受器敏感性在疲劳恢复期被暂时上调，体位转换触发的压力反射弧被过度激活。站立段指标可能比静卧更敏感地捕捉累积应激负荷。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">06</div>
+        <div class="finding-title">心理应激从下游否决运动正向适应</div>
+        <div class="finding-body">3/18 F01 + 3/19 P05完成后，当晚极度焦虑覆盖了两次干预储存的正向效应，3/20–3/22持续三天ANS低值（23–29ms）。这从下游验证了核心研究框架：ANS状态不仅受运动前基线影响，运动后的心理事件同样可以截断已经发生的迷走神经适应性改变。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">07</div>
+        <div class="finding-title">按摩超补偿：72h延迟的迷走神经回张峰</div>
+        <div class="finding-body">3/23晚英式芳香按摩后，D+1（47.3ms）和D+2（44.3ms）RMSSD未见明显升高，D+3（3/26）出现实验总峰值56.4ms。这符合深层软组织放松后的迷走神经超补偿机制——筋膜张力释放经历48–72h神经再整合后才在HRV上体现。按摩是本实验中效果最大的单次干预，且无交感代价。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">08</div>
+        <div class="finding-title">Feldenkrais效应依赖ANS储备：F2 vs F3对照</div>
+        <div class="finding-body">F2（进入RMSSD 56.4ms，高储备）与F3（进入RMSSD 28.8ms，感冒+低储备）均将HR从85–87降至59–60（↓约27bpm），即时下调效应一致。但F3课中DFA α1均值1.26（>1.0），结束后HR反弹至83，PNS跌回-1.68。Feldenkrais的副交感维持效应高度依赖可动员的ANS储备，储备耗尽时身体可被动降速但效应无法延续。</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>ANS × Exercise Intervention Study · JiangXintong · 2026</span>
+    <span>Kubios HRV · Polar H10 · N=37 days · 12 interventions</span>
+  </div>
+
+</div><!-- end page -->
+
+<script>
+// ── Data ──────────────────────────────────────────
+const DATA = [
+  {d:'2/24',rs:29.9,ps:0.08,ss:-0.03,hs:59,hst:73,sst:-0.92,t:null,ex:null,tp:'',cr:false,note:'基线参考日'},
+  {d:'2/25',rs:30.5,ps:0.37,ss:0.21,hs:58,hst:78,sst:2.02,t:null,ex:null,tp:'',cr:false,note:'直立SNS↑↑'},
+  {d:'2/26',rs:38.4,ps:0.84,ss:-0.35,hs:55,hst:68,sst:1.22,t:null,ex:null,tp:'',cr:false,note:''},
+  {d:'2/27',rs:20.1,ps:0.37,ss:0.52,hs:53,hst:69,sst:1.14,t:null,ex:null,tp:'',cr:false,note:'RMSSD急跌'},
+  {d:'2/28',rs:40,ps:1.00,ss:null,hs:53,hst:68,sst:-1.01,t:null,ex:'ANS综合测试*',tp:'',cr:false,note:'深呼吸HR反应8.5bpm⚠'},
+  {d:'3/1', rs:null,ps:null,ss:null,hs:null,hst:null,sst:null,t:null,ex:null,tp:'',cr:false,note:'缺失'},
+  {d:'3/2', rs:42.8,ps:1.06,ss:-0.77,hs:53,hst:69,sst:1.33,t:null,ex:null,tp:'',cr:false,note:''},
+  {d:'3/3', rs:46.1,ps:1.31,ss:-1.00,hs:51,hst:66,sst:1.12,t:null,ex:null,tp:'',cr:false,note:'自然峰值 46.1ms'},
+  {d:'3/4', rs:42.1,ps:0.72,ss:-0.63,hs:56,hst:76,sst:1.31,t:null,ex:null,tp:'',cr:false,note:''},
+  {d:'3/5', rs:41.1,ps:1.08,ss:-0.40,hs:53,hst:70,sst:1.09,t:30.5,ex:'P01私教',tp:'pilates',cr:false,note:'▲傍晚 MaxHR117'},
+  {d:'3/6', rs:42.0,ps:1.28,ss:-0.73,hs:52,hst:68,sst:1.19,t:null,ex:null,tp:'',cr:false,note:'★ P01次日 +0.9ms'},
+  {d:'3/7', rs:35.1,ps:0.71,ss:-0.17,hs:55,hst:75,sst:1.23,t:null,ex:null,tp:'',cr:false,note:'测时09:43⚠'},
+  {d:'3/8', rs:38.5,ps:0.89,ss:-0.54,hs:54,hst:63,sst:1.31,t:43.7,ex:'P02私教',tp:'pilates',cr:false,note:'▲上午 MaxHR122'},
+  {d:'3/9', rs:46.8,ps:0.99,ss:-0.77,hs:55,hst:67,sst:0.43,t:null,ex:null,tp:'',cr:false,note:'★ P02次日 +8.3ms 峰值'},
+  {d:'3/10',rs:38.9,ps:0.41,ss:-0.22,hs:59,hst:73,sst:1.54,t:null,ex:null,tp:'',cr:false,note:'D+2 回落'},
+  {d:'3/11',rs:37.6,ps:0.41,ss:-0.45,hs:58,hst:79,sst:2.42,t:null,ex:null,tp:'',cr:false,note:'直立SNS⚠'},
+  {d:'3/12',rs:54.2,ps:1.66,ss:-1.12,hs:50,hst:72,sst:1.22,t:41.0,ex:'P03私教',tp:'pilates',cr:false,note:'▲傍晚 MaxHR139⚠ 全实验新高'},
+  {d:'3/13',rs:24.6,ps:0.13,ss:-0.12,hs:57,hst:82,sst:2.26,t:23.7,ex:'G01团课',tp:'group',cr:true,note:'⚠ P03次日崩落 −29.6ms'},
+  {d:'3/14',rs:39.7,ps:0.83,ss:-0.73,hs:55,hst:69,sst:0.99,t:185.8,ex:'S01壁球',tp:'squash',cr:false,note:'▲ TRIMP185.8 MaxHR166 测时10:27'},
+  {d:'3/15',rs:34.7,ps:0.60,ss:-0.27,hs:56,hst:71,sst:1.22,t:null,ex:'P04筋膜松解',tp:'fascia',cr:false,note:'壁球D+1 无心率监测'},
+  {d:'3/16',rs:34.1,ps:0.33,ss:-0.16,hs:58,hst:70,sst:1.32,t:null,ex:null,tp:'',cr:false,note:'P04 D+1 测时10:32⚠'},
+  {d:'3/17',rs:40.4,ps:0.66,ss:-0.54,hs:57,hst:82,sst:2.46,t:null,ex:null,tp:'',cr:false,note:'P04 D+2 恢复↑ 直立SNS⚠'},
+  {d:'3/18',rs:37.5,ps:0.59,ss:-0.34,hs:56,hst:63,sst:0.37,t:null,ex:'F01 Feldenkrais',tp:'feld',cr:false,note:'▲晚 训练中SNS=0.07★'},
+  {d:'3/19',rs:null,ps:null,ss:null,hs:null,hst:null,sst:null,t:14.4,ex:'P05私教',tp:'pilates',cr:false,note:'无晨测 TRIMP14.4 ⚠当晚焦虑'},
+  {d:'3/20',rs:23.4,ps:0.29,ss:0.26,hs:55,hst:80,sst:2.00,t:null,ex:null,tp:'',cr:true,note:'⚠ 焦虑应激抑制'},
+  {d:'3/21',rs:29.0,ps:0.58,ss:-0.28,hs:54,hst:68,sst:1.66,t:null,ex:null,tp:'',cr:false,note:'测时10:01⚠'},
+  {d:'3/22',rs:25.2,ps:-0.06,ss:0.19,hs:60,hst:74,sst:2.45,t:null,ex:null,tp:'',cr:false,note:'直立SNS⚠'},
+  {d:'3/23',rs:47.0,ps:1.15,ss:-0.98,hs:53,hst:78,sst:2.24,t:null,ex:'英式芳香按摩(晚)',tp:'massage',cr:false,note:'焦虑解除反弹峰 · 晚间英式芳香按摩'},
+  {d:'3/24',rs:47.3,ps:1.70,ss:-1.27,hs:48,hst:68,sst:1.26,t:null,ex:null,tp:'',cr:false,note:'按摩D+1'},
+  {d:'3/25',rs:44.3,ps:0.84,ss:-0.61,hs:56,hst:79,sst:2.23,t:null,ex:null,tp:'',cr:false,note:'按摩D+2'},
+  {d:'3/26',rs:56.4,ps:1.68,ss:-1.33,hs:51,hst:71,sst:1.10,t:null,ex:'F02 Feldenkrais(晚)',tp:'feld',cr:false,note:'★ 实验新峰值 · 按摩D+3超补偿 · 晚傍晚F02',np:true},
+  {d:'3/27',rs:46.8,ps:0.97,ss:-0.63,hs:55,hst:81,sst:2.07,t:null,ex:null,tp:'',cr:false,note:'F02次日 −9.6ms（从超补偿峰回落，正常）'},
+  {d:'3/28',rs:42.8,ps:1.29,ss:-0.77,hs:51,hst:74,sst:1.77,t:null,ex:null,tp:'',cr:true,note:'⚠ 感冒发作 · 消炎药介入'},
+  {d:'3/29',rs:32.2,ps:0.15,ss:-0.04,hs:60,hst:81,sst:2.15,t:72.3,ex:'P06私教(感冒后)',tp:'pilates',cr:true,note:'⚠ DFA α1=1.154 感冒混杂 · 数据无效'},
+  {d:'3/30',rs:28.8,ps:0.37,ss:-0.12,hs:57,hst:77,sst:2.04,t:null,ex:'F03 Feldenkrais(晚)',tp:'feld',cr:false,note:'感冒恢复期 · 晚傍晚F03 · 区间最低'},
+];
+
+// ── Calendar ──────────────────────────────────────
+function buildCal() {
+  const byD = {};
+  DATA.forEach(d => { byD[d.d] = d; });
+  const months = [{n:'2月',m:2,days:28},{n:'3月',m:3,days:31}];
+  const dow = ['日','一','二','三','四','五','六'];
+  const container = document.getElementById('cal-container');
+  const wrap = document.createElement('div');
+  wrap.className = 'cal-wrap';
+
+  months.forEach(mo => {
+    const col = document.createElement('div');
+    col.className = 'cal-month';
+    const nameEl = document.createElement('div');
+    nameEl.className = 'cal-month-name';
+    nameEl.textContent = `2026年${mo.n}`;
+    col.appendChild(nameEl);
+    const dowRow = document.createElement('div');
+    dowRow.className = 'cal-dow-row';
+    dow.forEach(l => { const d = document.createElement('div'); d.className = 'cal-dow'; d.textContent = l; dowRow.appendChild(d); });
+    col.appendChild(dowRow);
+    const grid = document.createElement('div');
+    grid.className = 'cal-grid';
+    const start = new Date(2026, mo.m - 1, 1).getDay();
+    for (let i = 0; i < start; i++) {
+      const e = document.createElement('div');
+      e.className = 'cal-cell cal-empty';
+      grid.appendChild(e);
+    }
+    for (let d = 1; d <= mo.days; d++) {
+      const key = `${mo.m}/${d}`;
+      const r = byD[key];
+      const cell = document.createElement('div');
+      cell.className = 'cal-cell';
+      if (!r) { cell.className += ' cal-future'; cell.textContent = d; }
+      else if (r.rs === null && !r.ex) { cell.className += ' cal-miss'; cell.textContent = d; }
+      else {
+        const v = r.rs;
+        if (v === null) cell.className += ' cal-miss';
+        else if (v > 35) cell.className += ' c-ex35';
+        else if (v > 25) cell.className += ' c-25';
+        else if (v > 15) cell.className += ' c-15';
+        else cell.className += ' c-lo';
+
+        if (r.cr) cell.className += ' ring-crash';
+        else if (r.np) cell.className += ' ring-newpeak';
+        else if (r.tp === 'squash') cell.className += ' ring-squash';
+        else if (r.tp === 'feld') cell.className += ' ring-feld';
+        else if (r.tp === 'massage') cell.className += ' ring-massage';
+        else if (r.tp === 'fascia') cell.className += ' ring-fascia';
+        else if (r.tp === 'group') cell.className += ' ring-group';
+        else if (r.tp === 'pilates') cell.className += ' ring-pilates';
+
+        cell.textContent = d;
+        const tooltip = `${r.d}\nRMSSD: ${r.rs ?? '—'} ms | PNS: ${r.ps ?? '—'}\n${r.note || ''}`;
+        cell.title = tooltip;
+      }
+      grid.appendChild(cell);
+    }
+    col.appendChild(grid);
+    wrap.appendChild(col);
+  });
+  container.appendChild(wrap);
+}
+buildCal();
+
+// ── Table ─────────────────────────────────────────
+(function buildTable() {
+  const tbody = document.getElementById('data-tbody');
+  DATA.forEach(d => {
+    const tr = document.createElement('tr');
+    const isNP = d.np === true;
+    if (d.cr) tr.className = 'row-crash';
+    else if (isNP) tr.className = 'row-peak';
+    else if (d.ex && d.rs) tr.className = 'row-ex';
+
+    const dhr = d.hs != null && d.hst != null ? d.hst - d.hs : null;
+    const exLabel = d.ex || '—';
+    const rsClass = d.cr ? 'bad' : isNP ? 'good' : d.rs && d.rs < 25 ? 'warn' : '';
+
+    tr.innerHTML = `
+      <td><b>${d.d}</b></td>
+      <td>${exLabel}</td>
+      <td class="${rsClass}">${d.rs != null ? d.rs.toFixed(1) : '—'}</td>
+      <td class="${d.ps != null && d.ps > 0.5 ? 'good' : ''}">${d.ps != null ? (d.ps >= 0 ? '+' : '') + d.ps.toFixed(2) : '—'}</td>
+      <td class="${d.ss != null && d.ss > 0.5 ? 'warn' : ''}">${d.ss != null ? (d.ss >= 0 ? '+' : '') + d.ss.toFixed(2) : '—'}</td>
+      <td>${dhr != null ? (dhr > 0 ? '+' : '') + dhr : '—'}</td>
+      <td class="${d.sst != null && d.sst > 2 ? 'bad' : d.sst != null && d.sst < 0.3 ? 'good' : ''}">${d.sst != null ? (d.sst >= 0 ? '+' : '') + d.sst.toFixed(2) : '—'}</td>
+      <td class="${d.t && d.t > 100 ? 'warn' : ''}">${d.t != null ? d.t.toFixed(1) : '—'}</td>
+      <td style="text-align:left;font-family:'DM Sans',sans-serif;font-size:11px;color:#9a9590">${d.note}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+})();
+
+// ── Charts ────────────────────────────────────────
+let chart = null;
+const plotD = DATA.filter(d => !d.cr || d.rs != null).filter(d => d.rs != null || d.d === '3/19');
+const allD = DATA;
+
+const chartDefs = {
+  rmssd: {
+    cfg() {
+      const valid = allD.filter(d => d.rs != null);
+      const ptBg = valid.map(d =>
+        d.cr ? '#b52828' : d.np ? '#1a1916' :
+        d.tp === 'squash' ? '#b5620a' : d.tp === 'feld' ? '#2d7a4f' :
+        d.tp === 'massage' ? '#d4537e' : d.tp === 'pilates' ? '#1a5fa8' : '#6ab98a'
+      );
+      const ptR = valid.map(d => d.np ? 8 : d.cr ? 7 : d.tp ? 6 : 4);
+      return {
+        type: 'line',
+        data: {
+          labels: valid.map(d => d.d),
+          datasets: [
+            {
+              label: 'RMSSD (ms)',
+              data: valid.map(d => d.rs),
+              borderColor: '#2d7a4f',
+              backgroundColor: 'rgba(45,122,79,.08)',
+              pointBackgroundColor: ptBg,
+              pointBorderColor: ptBg,
+              pointRadius: ptR,
+              tension: .3,
+              fill: true,
+              spanGaps: true,
+            },
+            {
+              label: '实验新峰值 56.4ms',
+              data: valid.map(() => 56.4),
+              borderColor: 'rgba(45,122,79,.4)',
+              borderDash: [3, 3],
+              pointRadius: 0,
+              fill: false,
+            },
+            {
+              label: '自然峰值线 46.1ms',
+              data: valid.map(() => 46.1),
+              borderColor: 'rgba(0,0,0,.15)',
+              borderDash: [6, 4],
+              pointRadius: 0,
+              fill: false,
+            }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { min: 15, max: 62, ticks: { font: { size: 11 }, fontFamily: 'DM Mono' }, grid: { color: 'rgba(0,0,0,.06)' } },
+            x: { ticks: { font: { size: 10 }, maxRotation: 40 }, grid: { display: false } }
+          }
+        }
+      };
+    }
+  },
+  pns: {
+    cfg() {
+      const h = allD.filter(d => d.ss != null);
+      return {
+        type: 'bar',
+        data: {
+          labels: h.map(d => d.d),
+          datasets: [
+            {
+              label: 'PNS index',
+              data: h.map(d => d.ps),
+              backgroundColor: h.map(d => d.cr ? '#e06060' : d.rs >= 54 ? '#1a1916' : d.ps >= 0 ? '#6ab98a' : '#f5c06a'),
+              borderRadius: 3,
+            },
+            {
+              label: 'SNS index',
+              data: h.map(d => d.ss),
+              backgroundColor: h.map(d => d.ss <= 0 ? '#a8c8f0' : '#f5c06a'),
+              borderRadius: 3,
+            }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { ticks: { font: { size: 11 } }, grid: { color: 'rgba(0,0,0,.06)' } },
+            x: { ticks: { font: { size: 10 }, maxRotation: 40 }, grid: { display: false } }
+          }
+        }
+      };
+    }
+  },
+  ortho: {
+    cfg() {
+      const h = allD.filter(d => d.hs != null && d.hst != null);
+      return {
+        type: 'bar',
+        data: {
+          labels: h.map(d => d.d),
+          datasets: [
+            {
+              label: 'ΔHR 立−卧 (bpm)',
+              data: h.map(d => d.hst - d.hs),
+              backgroundColor: '#a8c8f0',
+              borderRadius: 3,
+            },
+            {
+              label: '站立 SNS index',
+              data: h.map(d => d.sst),
+              backgroundColor: h.map(d => d.sst > 2 ? '#e06060' : d.sst > 1 ? '#f5c06a' : '#6ab98a'),
+              borderRadius: 3,
+            }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { ticks: { font: { size: 11 } }, grid: { color: 'rgba(0,0,0,.06)' } },
+            x: { ticks: { font: { size: 10 }, maxRotation: 40 }, grid: { display: false } }
+          }
+        }
+      };
+    }
+  },
+  dose: {
+    cfg() {
+      return {
+        type: 'bar',
+        data: {
+          labels: ['P01\n3/5', 'P02★\n3/8', 'P03⚠\n3/12', 'G01\n3/13', '壁球\n3/14', '按摩\n3/23', 'F02\n3/26', 'P06⚠\n3/29'],
+          datasets: [
+            {
+              label: '次日 ΔRMSSD (ms)',
+              data: [0.9, 8.3, -29.6, null, -5.0, 0.3, -9.6, -3.4],
+              backgroundColor: ['#6ab98a', '#2d7a4f', '#e06060', '#ccc', '#f5c06a', '#d4537e', '#6ab98a', '#f5c06a'],
+              borderRadius: 4,
+              yAxisID: 'y',
+            },
+            {
+              label: '运动前 RMSSD',
+              data: [41.1, 38.5, 54.2, 24.6, 39.7, 47.0, 56.4, 32.2],
+              backgroundColor: 'rgba(168,200,240,.5)',
+              borderRadius: 4,
+              yAxisID: 'y2',
+            }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { ticks: { font: { size: 11 } }, title: { display: true, text: 'ΔRMSSD (ms)', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,.06)' } },
+            y2: { position: 'right', min: 0, max: 65, ticks: { font: { size: 11 } }, grid: { display: false }, title: { display: true, text: '运动前 RMSSD', font: { size: 10 } } },
+            x: { ticks: { font: { size: 10 }, maxRotation: 0 }, grid: { display: false } }
+          }
+        }
+      };
+    }
+  }
+};
+
+function switchChart(key, btn) {
+  document.querySelectorAll('.ctab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  if (chart) { chart.destroy(); chart = null; }
+  chart = new Chart(document.getElementById('mainChart'), chartDefs[key].cfg());
+}
+switchChart('rmssd', document.querySelector('.ctab.active'));
+</script>
+</body>
+</html>
