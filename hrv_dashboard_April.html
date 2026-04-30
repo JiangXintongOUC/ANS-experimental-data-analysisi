@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANS × 运动干预追踪报告 — JiangXintong</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg: #f7f6f2;
+  --bg2: #eeecea;
+  --bg3: #e4e1dc;
+  --ink: #1a1916;
+  --ink2: #5a5752;
+  --ink3: #9a9590;
+  --line: rgba(26,25,22,0.12);
+  --green: #2d7a4f;
+  --green-l: #e8f5ee;
+  --green-m: #6ab98a;
+  --amber: #b5620a;
+  --amber-l: #fdf0e0;
+  --red: #b52828;
+  --red-l: #fce8e8;
+  --blue: #1a5fa8;
+  --blue-l: #e5eef9;
+  --purple: #6b3fa0;
+  --purple-l: #f0eaf9;
+  --teal: #1a7a6e;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 32px 80px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 48px;
+  border-bottom: 1.5px solid var(--ink);
+  padding-bottom: 24px;
+}
+.header-left {}
+.header-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .12em;
+  color: var(--ink3);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+h1 {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -.02em;
+  line-height: 1.15;
+}
+h1 span { color: var(--green); }
+.header-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--ink3);
+  text-align: right;
+  line-height: 1.8;
+}
+
+/* Section titles */
+.section-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 0.5px;
+  background: var(--line);
+}
+section { margin-bottom: 40px; }
+
+/* KPI cards */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+.kpi {
+  background: white;
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+.kpi-label { font-size: 11px; color: var(--ink3); margin-bottom: 4px; }
+.kpi-value { font-size: 22px; font-weight: 600; letter-spacing: -.02em; line-height: 1; }
+.kpi-sub { font-size: 11px; color: var(--ink3); margin-top: 5px; }
+.kpi-value.good { color: var(--green); }
+.kpi-value.warn { color: var(--amber); }
+.kpi-value.bad { color: var(--red); }
+
+/* Alert box */
+.alert {
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 12.5px;
+  line-height: 1.7;
+  margin-bottom: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.alert.green { background: var(--green-l); border-left: 3px solid var(--green); }
+.alert.red { background: var(--red-l); border-left: 3px solid var(--red); }
+.alert.amber { background: var(--amber-l); border-left: 3px solid var(--amber); }
+.alert strong { font-weight: 600; }
+
+/* Calendar heatmap */
+.cal-wrap { display: flex; gap: 32px; overflow-x: auto; padding-bottom: 4px; }
+.cal-month {}
+.cal-month-name {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink2);
+  margin-bottom: 10px;
+}
+.cal-dow-row {
+  display: grid;
+  grid-template-columns: repeat(7, 32px);
+  gap: 3px;
+  margin-bottom: 3px;
+}
+.cal-dow {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  text-align: center;
+  color: var(--ink3);
+  letter-spacing: .05em;
+}
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 32px);
+  gap: 3px;
+}
+.cal-cell {
+  width: 32px;
+  height: 32px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  cursor: default;
+  position: relative;
+  transition: transform .1s;
+}
+.cal-cell:hover { transform: scale(1.15); z-index: 10; }
+.cal-empty { background: transparent; }
+.cal-future { background: var(--bg2); color: var(--ink3); }
+.cal-miss { background: var(--bg3); color: var(--ink3); }
+.c-ex35 { background: #2d7a4f; color: #e8f5ee; }
+.c-25 { background: #6ab98a; color: #1a4030; }
+.c-15 { background: #f5c06a; color: #5a3a00; }
+.c-lo { background: #e06060; color: #fff; }
+/* ── 日历格子干预标记 — 底部色条，比outline更清晰 ── */
+.mark-pilates  { border-bottom: 4px solid #1a5fa8; }
+.mark-feld     { border-bottom: 4px solid #0f8c5a; }
+.mark-squash   { border-bottom: 4px solid #b5620a; }
+.mark-massage  { border-bottom: 4px solid #d4537e; }
+.mark-fascia   { border-bottom: 4px solid #6b3fa0; }
+.mark-group    { border-bottom: 4px solid #888780; }
+.mark-yoga     { border-bottom: 4px solid #e07b39; }
+.mark-travel   { border-bottom: 4px solid #1a7a6e; }
+.mark-crash    { outline: 2px solid #b52828; outline-offset: 0px; opacity: 0.85; }
+.mark-newpeak  { outline: 3px solid #1a1916; outline-offset: 1px; }
+
+.cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 14px;
+}
+.leg-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--ink2);
+}
+.leg-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* Chart container */
+.chart-box {
+  background: white;
+  border: 0.5px solid var(--line);
+  border-radius: 10px;
+  padding: 20px 24px;
+}
+.chart-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.ctab {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 0.5px solid var(--line);
+  background: transparent;
+  color: var(--ink2);
+  font-family: 'DM Sans', sans-serif;
+  transition: all .15s;
+}
+.ctab:hover { background: var(--bg2); }
+.ctab.active { background: var(--ink); color: white; border-color: var(--ink); }
+.chart-canvas-wrap { position: relative; height: 260px; }
+
+/* Exercise comparison table */
+.ex-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.ex-card {
+  background: white;
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+}
+.ex-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ex-card-title .ex-name { font-size: 13px; }
+.ex-card-title .ex-date { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ink3); font-weight: 400; }
+.ex-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--ink2);
+  padding: 2px 0;
+}
+.ex-row .val { font-weight: 500; color: var(--ink); }
+.ex-divider { height: 0.5px; background: var(--line); margin: 8px 0; }
+.ex-effect {
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 6px;
+}
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .02em;
+}
+.badge-green { background: var(--green-l); color: var(--green); }
+.badge-amber { background: var(--amber-l); color: var(--amber); }
+.badge-red { background: var(--red-l); color: var(--red); }
+.badge-blue { background: var(--blue-l); color: var(--blue); }
+.badge-purple { background: var(--purple-l); color: var(--purple); }
+
+/* Bar visual */
+.bar-row { margin: 6px 0; }
+.bar-label { font-size: 10px; color: var(--ink3); margin-bottom: 2px; display: flex; justify-content: space-between; }
+.bar-track { height: 6px; background: var(--bg2); border-radius: 3px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 3px; }
+
+/* Data table */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.data-table th {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  text-align: right;
+  padding: 8px 8px;
+  border-bottom: 1px solid var(--line);
+  font-weight: 500;
+}
+.data-table th:first-child, .data-table th:nth-child(2) { text-align: left; }
+.data-table td {
+  padding: 7px 8px;
+  text-align: right;
+  border-bottom: 0.5px solid var(--line);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+}
+.data-table td:first-child, .data-table td:nth-child(2) { text-align: left; font-family: 'DM Sans', sans-serif; }
+.data-table tr:hover td { background: var(--bg2); }
+.data-table .row-crash td { background: rgba(181,40,40,.05); }
+.data-table .row-peak td { background: rgba(45,122,79,.08); }
+.data-table .row-ex td { background: rgba(26,95,168,.04); }
+td.good { color: var(--green); font-weight: 500; }
+td.bad { color: var(--red); }
+td.warn { color: var(--amber); }
+
+/* Findings */
+.findings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.finding-card {
+  background: white;
+  border: 0.5px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+}
+.finding-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 32px;
+  font-weight: 300;
+  color: var(--bg3);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.finding-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.finding-body { font-size: 12px; color: var(--ink2); line-height: 1.7; }
+
+/* Footer */
+.footer {
+  margin-top: 56px;
+  padding-top: 20px;
+  border-top: 0.5px solid var(--line);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--ink3);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Tooltip */
+.cal-cell[title] { cursor: help; }
+
+@media (max-width: 768px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .ex-grid { grid-template-columns: 1fr 1fr; }
+  .findings-grid { grid-template-columns: 1fr; }
+  h1 { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-tag">自主神经系统 × 运动干预追踪报告</div>
+      <h1>ANS <span>Resilience</span> 实验<br>JiangXintong</h1>
+    </div>
+    <div class="header-meta">
+      Female / 33y / 158cm / 60kg<br>
+      设备：Polar H10 + Kubios HRV<br>
+      观测期：2026.02.24 — 04.08<br>
+      正位测试：46天 · 运动干预：15次<br>
+      生成：2026.04.28
+    </div>
+  </div>
+
+  <!-- KPI -->
+  <section>
+    <div class="section-title">核心指标总览</div>
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-label">全实验 RMSSD 峰值</div>
+        <div class="kpi-value good">65.9</div>
+        <div class="kpi-sub">ms · 4/25 情绪五维全满 · 瑜伽+冥想</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">基线均值 RMSSD</div>
+        <div class="kpi-value">38.4</div>
+        <div class="kpi-sub">ms · 全期平均（含感冒期）</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">迷走增益基线</div>
+        <div class="kpi-value warn">8.5</div>
+        <div class="kpi-sub">bpm 深呼吸HR反应 · 正常&gt;11</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">最大单日崩落</div>
+        <div class="kpi-value bad">−29.6</div>
+        <div class="kpi-sub">ms · 3/13 P03超阈值⚠</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">P07次日效应</div>
+        <div class="kpi-value good">+8.2</div>
+        <div class="kpi-sub">ms · 4/3 感冒后首次绿灯恢复</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key alerts -->
+  <section>
+    <div class="section-title">关键事件</div>
+    <div class="alert green">
+      <div class="alert-icon">★</div>
+      <div><strong>P02普拉提（3/8上午）→ 次日+8.3ms</strong>：TRIMP 43.7 / MaxHR 122bpm，迄今最优单次运动效应。强度刚好落在阈值以内，产生了显著的迷走神经适应性提升，次日（3/9）RMSSD 46.8ms首次以运动方式突破自然峰值46.1ms。</div>
+    </div>
+    <div class="alert red">
+      <div class="alert-icon">⚠</div>
+      <div><strong>P03普拉提（3/12傍晚）→ 次日−29.6ms</strong>：TRIMP 41.0（低于P02），但MaxHR达139bpm（首现Hard区间1.4%），超过强度阈值（估计125–130bpm）。在全实验最高晨测状态（54.2ms）下发生交感过激，次日产生最大崩落。验证了"高基线ANS ≠ 可承受高强度"的核心假设。</div>
+    </div>
+    <div class="alert amber">
+      <div class="alert-icon">⚠</div>
+      <div><strong>心理应激否决机制（3/19晚）</strong>：F01 Feldenkrais + P05轻量普拉提完成后，当晚极度焦虑导致睡眠极差，3/20–3/22连续三天ANS低值（23–29ms）。F01/P05的正向适应效应被心理应激从下游完全覆盖，是"应激否决机制"的活体验证。</div>
+    </div>
+    <div class="alert green">
+      <div class="alert-icon">◆</div>
+      <div><strong>按摩超补偿（3/23晚→3/26峰）</strong>：英式芳香按摩后72小时出现RMSSD 56.4ms（实验总峰值），远超即时效应。深层软组织放松触发的迷走神经回张存在典型的48–72h延迟，3/26晨测是实验中迄今最高单日副交感张力记录，PNS +1.68，LF/HF 0.316，DFA α1 0.766。</div>
+    </div>
+    <div class="alert red">
+      <div class="alert-icon">⚠</div>
+      <div><strong>感冒叠加P06（3/28发病→3/29训练）</strong>：3/28感冒，消炎药介入，次日晨测出现三重异常信号（RMSSD 32.2ms↓、DFA α1 1.154>1.0过度规则化、LF/HF 0.996≈1.0交感偏高）。在红灯状态下完成72.3 TRIMP / VT1以上5.7%的P06，3/30进一步跌至28.8ms。P06数据标记为感冒混杂，不纳入干预效果分析。</div>
+    </div>
+    <div class="alert amber">
+      <div class="alert-icon">◈</div>
+      <div><strong>F2 vs F3：相同技术，不同底层状态，不同结局</strong>：两次费登奎斯均将HR从85–87 bpm降至59–60 bpm（↓约27 bpm），即时下调效应一致。但F2（健康基线56.4ms）结束后HR回至68、PNS恢复至-0.53；F3（感冒恢复+低RMSSD 28.8ms）结束后HR反弹至83、PNS跌回-1.68。说明费登奎斯的副交感维持效应高度依赖ANS储备，储备耗尽时即时平静无法延续至课后。</div>
+    </div>
+    <div class="alert green">
+      <div class="alert-icon">◆</div>
+      <div><strong>壁球悖论（3/14）</strong>：TRIMP 185.8（P02的4.3倍）/ MaxHR 166bpm / VT1以上21.8%，但次日RMSSD仅跌5ms。壁球的间歇式结构（高强度冲刺→短暂换气→再冲刺）在极高总负荷下对ANS的实际抑制远小于持续强度峰值的P03。揭示：TRIMP与次日ANS状态不相关，MaxHR和运动结构才是决定因素。</div>
+    </div>
+    <div class="alert green">
+      <div class="alert-icon">◈</div>
+      <div><strong>中医针灸+艾灸（3/31）→ 次日+2.1ms，D+2 +6.3ms</strong>：感冒后RMSSD低至28.8ms，中午针灸+艾灸后，次日（4/1）反弹至41.1ms（+12.3ms），D+2（4/2）进一步升至47.4ms。参考按摩的72h延迟超补偿规律，针灸的深层神经调节效应同样存在滞后性。作为被动干预类型，针灸在感冒恢复期提供了有效的ANS重启支撑。</div>
+    </div>
+    <div class="alert green">
+      <div class="alert-icon">★</div>
+      <div><strong>P07感冒后恢复验证（4/2晚）→ 次日+8.2ms</strong>：感冒彻底恢复后，在绿灯状态（晨测47.4ms）下完成MaxHR 116bpm / TRIMP 38.7的阈值内普拉提，次日（4/3）RMSSD升至55.6ms（+8.2ms）。与P02（MaxHR122 → +8.3ms）几乎一致，验证了：绿灯状态 + MaxHR低于125bpm = 稳定产生+8ms级别的次日ANS提升，该效应具有可重复性。</div>
+    </div>
+    <div class="alert amber">
+      <div class="alert-icon">◈</div>
+      <div><strong>G02团课（4/3下午）→ 次日−11.3ms · 归因：早机出行</strong>：在55.6ms高基线下完成MaxHR105 / TRIMP22.5极轻量团课，次日（4/4）RMSSD跌至44.3ms（−11.3ms）。但4/4为早起赶飞机日，睡眠中断+交感强制激活是更合理的主因。此次数据不能对团课本身效应下结论，G02的真实干预效果需等无出行干扰的正常次日数据验证。</div>
+    </div>
+    <div class="alert green">
+      <div class="alert-icon">★★</div>
+      <div><strong>青岛旅行悖论（4/4–4/7）→ 全实验新峰值59ms</strong>：飞往青岛旅行3天，期间RMSSD先跌（4/5 33.3ms、4/6 32.3ms，含头痛插曲），但4/7当天飞回广州，晨测RMSSD达59ms（全实验峰值，超越3/26的56.4ms）。零工作压力+低疲劳感+充分脱离日常应激源的旅行，对ANS产生了比任何单次干预更强的超补偿效应。"什么都不做"在对的条件下是最强的干预。</div>
+    </div>
+    <div class="alert red">
+      <div class="alert-icon">⚠</div>
+      <div><strong>第二次按摩超补偿失败（4/8→D+3 4/11仅33.9ms）</strong>：第一次按摩（3/23，进入47.0ms）D+3出现56.4ms峰值（+9.4ms）；第二次按摩（4/8，进入58.1ms）D+1−31.2ms（心理事件干扰），D+2+6.0ms，D+3仅33.9ms。与第一次相比，不仅没有超补偿，D+3值甚至低于按摩前基线（58.1ms）21ms以上。归因竞争：①心理事件（4/9）彻底覆盖了按摩效应；②高基线进入（58.1ms）本身制约了超补偿空间。两个机制可能同时成立。</div>
+    </div>
+    <div class="alert green">
+      <div class="alert-icon">★</div>
+      <div><strong>S02壁球次日+9.8ms（4/13）— 间歇结构保护假说进一步验证</strong>：S02（TRIMP391.5 / MaxHR178 / Hard70.2% / VT1+78.1%）在前夜睡眠受损（聚会，3/5）条件下完成，HRR60s仅8.3bpm显示训练结束时ANS已高度疲劳。然而次日RMSSD从35.5ms升至45.3ms（+9.8ms），是本实验所有训练干预中的最大次日正向效应。尽管当天主观感受极差（睡眠质量1/5、疲劳7/10），晨测数据显示ANS客观上完成了显著的夜间超补偿。壁球间歇结构对ANS的保护+激活效应，在比S01更极端的条件下仍然成立。</div>
+    </div>
+    <div class="alert red">
+      <div class="alert-icon">⚠</div>
+      <div><strong>4/20 DFA α1 = 1.195 — 非感冒期最高：训练过载 × 心理低谷的叠加崩落</strong>：前夜聚会喝茶至深夜（入睡02:16），晨测RMSSD 34.1ms黄灯、DFA 0.954、安全感1/5、疲劳9/10。在此状态下完成P09私教（MaxHR136⚠超阈值/VT1 84.5%）和S03壁球（TRIMP361.8/MaxHR165）。这是实验中状态最差时进行最大训练量的一次。P09 VT1 84.5%是所有普拉提中最高的高强度区间比例，4/20晨测是"红灯状态下双训练"的关键数据点。</div>
+    </div>
+    <div class="alert green">
+      <div class="alert-icon">★★</div>
+      <div><strong>4/29 RMSSD 68.9ms — 全实验新高：情绪低谷后瑜伽冥想干预次日</strong>：4/28事件时序：中午G04普拉提团课（MaxHR91极轻）→ 下午发生心理情绪低谷（效价1/安全感2/反刍4）→ 晚上主动进行瑜伽+冥想针对性干预（冥想段DFA0.984）。次日正位RMSSD 56.5ms（+3.1ms）· 静息报告68.9ms因近入睡状态不纳入序列。关键解读：G04轻量团课的时效性可能只持续至下午，情绪低谷发生时运动效应已消退；晚上的瑜伽冥想是在知道情绪低谷已发生后的主动干预，而非碰巧。这是实验首次记录"用身心双向干预主动应对当日心理应激"并观测到次日ANS超补偿的案例，为双向干预的时序效应提供了重要数据点。</div>
+    </div>
+    <div class="alert green">
+      <div class="alert-icon">★</div>
+      <div><strong>4/25 RMSSD 65.9ms — 原全实验新高，情绪五维全满</strong>：瑜伽+冥想当天，情绪效价5/唤醒5/安全感5/反刍0，DFA 0.755绿灯，冥想段PNS+0.43（四次瑜伽中唯一正值）。与4/29的对比揭示了一个有趣的对照：4/25是情绪最佳状态下的高峰，4/29是情绪最差状态下反而出现更高峰——说明干预的效果不完全由情绪状态决定，当晚的躯体+认知双向干预可能具有独立的ANS修复效应。</div>
+    </div>
+    <div class="alert amber">
+      <div class="alert-icon">◈</div>
+      <div><strong>S04壁球（4/26）TRIMP 473.3 / MaxHR 185 — 实验最大负荷</strong>：TRIMP 473.3超过S02（391.5），是实验迄今最大单次训练负荷，MaxHR 185bpm、VT1以上82.5%、HRR60s仅2.9bpm（极度低迷）。进入状态绿灯（47ms），情绪五维全满（5/5/5/0）。4/27晨测49.6ms，仅跌2.6ms——在最大负荷下仍然几乎持平，进一步强化了"壁球间歇结构对ANS的保护效应"假说，且高情绪状态可能是额外保护因子。</div>
+    </div>
+
+  </section>
+
+  <!-- Key alerts -->
+  <section>
+    <div class="section-title">关键事件与异常</div>
+
+    <div class="alert red">
+      <div class="alert-icon">⚠</div>
+      <div><strong>4/20 DFA α1 = 1.195 — 非感冒期最高：训练过载 × 心理低谷叠加崩落</strong>：4/19双高强度训练（P09 MaxHR136⚠ + S03 TRIMP361.8）叠加深夜社交（入睡02:16）和极差心情（效价2/安全感1），导致4/20晨测DFA 1.195，超过4/9的1.078，是非感冒、非躯体症状下的实验最高值。DFA >1.0代表ANS调节复杂度崩落——心跳从"分形自相似的灵活调节"变为"过度规则的防御模式"，对应多重迷走神经理论中的背侧迷走关闭状态（极低唤醒1/5 + 极低效价1/5 + 安全感不足2/5）。重要的是4/20的RMSSD仍有41.6ms看似黄灯，但DFA已红灯——这是RMSSD与DFA解离的典型案例：RMSSD衡量变异幅度，DFA衡量调节复杂度，前者尚可但后者已崩，说明ANS还能维持数量上的变异，但调节质量已经严重下降。同日进行第三次英式芳香按摩，D+1–D+3将揭示按摩能否在此状态下产生效应。</div>
+    </div>
+
+  </section>
+  <section>
+    <div class="section-title">日历热图 — 静卧 RMSSD（ms）</div>
+    <div id="cal-container"></div>
+    <div class="cal-legend">
+      <div style="width:100%;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px">晨测 RMSSD 水平</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#2d7a4f"></div>&gt;35ms 优秀</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#6ab98a"></div>25–35ms 良好</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#f5c06a"></div>15–25ms 一般</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#e06060"></div>&lt;15ms 偏低</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#e4e1dc"></div>缺失</div>
+      <div style="width:100%;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin:10px 0 6px">底部色条 = 当日干预类型</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#eeecea;border-bottom:4px solid #1a5fa8"></div>普拉提私教</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#eeecea;border-bottom:4px solid #0f8c5a"></div>Feldenkrais</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#eeecea;border-bottom:4px solid #d4537e"></div>按摩</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#eeecea;border-bottom:4px solid #6b3fa0"></div>针灸·筋膜</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#eeecea;border-bottom:4px solid #b5620a"></div>壁球</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#eeecea;border-bottom:4px solid #888780"></div>团课</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#eeecea;border-bottom:4px solid #e07b39"></div>瑜伽</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#eeecea;border-bottom:4px solid #1a7a6e"></div>旅行</div>
+      <div style="width:100%;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin:10px 0 6px">特殊标记</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#e4e1dc;outline:2px solid #b52828;outline-offset:0px"></div>⚠ 崩落 / 感冒 / 应激</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#2d7a4f;outline:3px solid #1a1916;outline-offset:1px"></div>★ 阶段峰值</div>
+    </div>
+  </section>
+
+  <!-- Charts -->
+  <section>
+    <div class="section-title">趋势分析</div>
+    <div class="chart-box">
+      <div class="chart-tabs">
+        <button class="ctab active" onclick="switchChart('rmssd',this)">RMSSD 趋势</button>
+        <button class="ctab" onclick="switchChart('pns',this)">PNS / SNS</button>
+        <button class="ctab" onclick="switchChart('ortho',this)">直立反应</button>
+        <button class="ctab" onclick="switchChart('dose',this)">干预效应</button>
+        <button class="ctab" onclick="switchChart('intensity',this)">强度结构</button>
+        <button class="ctab" onclick="switchChart('emotion',this)">情绪 × ANS</button>
+        <button class="ctab" onclick="switchChart('extype',this)">运动类型结构</button>
+      </div>
+      <div class="chart-canvas-wrap"><canvas id="mainChart"></canvas></div>
+    </div>
+  </section>
+
+  <!-- Exercise comparison - dynamic, grouped by type -->
+  <section>
+    <div class="section-title">运动干预档案对比</div>
+    <div id="ex-section-container"></div>
+  </section>
+
+  </section>
+
+  <!-- Data table -->
+  <section>
+    <div class="section-title">原始数据明细</div>
+    <div style="overflow-x:auto">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>日期</th>
+            <th>干预</th>
+            <th>RMSSD</th>
+            <th>PNS</th>
+            <th>SNS</th>
+            <th>ΔHR</th>
+            <th>SNS立</th>
+            <th>DFA α1</th>
+            <th>LF/HF</th>
+            <th>TRIMP</th>
+            <th>MaxHR</th>
+            <th>Hard%</th>
+            <th>VT1%</th>
+            <th>压力</th>
+            <th>饮酒</th>
+            <th>效价</th>
+            <th>唤醒</th>
+            <th>安全感</th>
+            <th>反刍</th>
+            <th>备注</th>
+          </tr>
+        </thead>
+        <tbody id="data-tbody"></tbody>
+      </table>
+    </div>
+    <div style="font-size:11px;color:var(--ink3);margin-top:8px;font-family:'DM Mono',monospace">
+      ⚠ 测时偏晚：3/7(09:43) 3/14(10:27) 3/16(10:32) 3/21(10:01)，RMSSD可能被低估约2–5ms。<br>
+      * 2/28数据来源ANS功能综合测试。静卧段标准2分钟（4月起延长至3分钟）。
+    </div>
+  </section>
+
+  <!-- Key findings -->
+  <section>
+    <div class="section-title">核心研究发现</div>
+    <div class="findings-grid">
+
+      <div class="finding-card">
+        <div class="finding-num">01</div>
+        <div class="finding-title">强度阈值而非总负荷决定次日ANS状态</div>
+        <div class="finding-body">TRIMP与次日RMSSD变化不相关（壁球TRIMP185.8仅抑制5ms，P03 TRIMP41却崩落29.6ms）。MaxHR和Hard区间占比是核心预测变量。当前估计个人阈值约在MaxHR 125–130bpm之间，超越则触发ANS抑制，低于则产生正向适应。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">02</div>
+        <div class="finding-title">间歇式运动结构对ANS的保护效应</div>
+        <div class="finding-body">壁球虽达到HRmax（166bpm），但其间歇式结构（冲刺→停顿→冲刺）使ANS在极高总负荷下仅产生轻度抑制（−5ms）。这支持假说：间歇结构在每次高强度段后提供小幅度迷走神经再激活机会，实际上是在训练vagal brake的快速切换能力，而非单纯消耗。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">03</div>
+        <div class="finding-title">Feldenkrais是唯一副交感主导运动方式</div>
+        <div class="finding-body">F01训练中SNS index仅0.07，接近ANS中性，是本实验所有运动类型中唯一不触发交感激活的训练。其机制是通过极慢的本体感受探索绕过防御性收缩，在副交感主导状态下完成神经动作模式的重塑。训练后SNS反弹至1.38属于正常振荡，不是负面信号。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">04</div>
+        <div class="finding-title">迷走增益不足（vagal brake受限）</div>
+        <div class="finding-body">2/28 ANS功能测试深呼吸HR反应仅8.5bpm（正常均值31±9bpm），低于11bpm阈值。这揭示迷走神经的可动员幅度受限——静息张力存在（晨测PNS可达+1.66），但在需要快速激活或快速恢复时增益不足。这与慢性工作压力下的长期交感高张力状态直接相关。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">05</div>
+        <div class="finding-title">"卧好立差"解离模式：压力感受器超敏</div>
+        <div class="finding-body">实验中出现5次"静卧RMSSD良好但站立SNS激剧增高"的解离现象（2/25、3/11、3/17、3/20、3/22），均发生在高负荷事件后的恢复期。提示：压力感受器敏感性在疲劳恢复期被暂时上调，体位转换触发的压力反射弧被过度激活。站立段指标可能比静卧更敏感地捕捉累积应激负荷。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">06</div>
+        <div class="finding-title">心理应激从下游否决运动正向适应</div>
+        <div class="finding-body">3/18 F01 + 3/19 P05完成后，当晚极度焦虑覆盖了两次干预储存的正向效应，3/20–3/22持续三天ANS低值（23–29ms）。这从下游验证了核心研究框架：ANS状态不仅受运动前基线影响，运动后的心理事件同样可以截断已经发生的迷走神经适应性改变。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">07</div>
+        <div class="finding-title">按摩超补偿：72h延迟的迷走神经回张峰</div>
+        <div class="finding-body">3/23晚英式芳香按摩后，D+1（47.3ms）和D+2（44.3ms）RMSSD未见明显升高，D+3（3/26）出现实验总峰值56.4ms。这符合深层软组织放松后的迷走神经超补偿机制——筋膜张力释放经历48–72h神经再整合后才在HRV上体现。按摩是本实验中效果最大的单次干预，且无交感代价。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">08</div>
+        <div class="finding-title">Feldenkrais效应依赖ANS储备：F2 vs F3对照</div>
+        <div class="finding-body">F2（进入RMSSD 56.4ms，高储备）与F3（进入RMSSD 28.8ms，感冒+低储备）均将HR从85–87降至59–60（↓约27bpm），即时下调效应一致。但F3课中DFA α1均值1.26（>1.0），结束后HR反弹至83，PNS跌回-1.68。Feldenkrais的副交感维持效应高度依赖可动员的ANS储备，储备耗尽时身体可被动降速但效应无法延续。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">09</div>
+        <div class="finding-title">被动干预（针灸/按摩）在低储备期的恢复效能</div>
+        <div class="finding-body">感冒恢复期RMSSD 28.8ms时，主动运动（P06 TRIMP72.3）导致次日进一步下跌；而3/31中医针灸+艾灸后，4/1反弹至41.1ms（+12.3ms），4/2进一步升至47.4ms。结合3/23按摩→72h后56.4ms的案例，被动干预在ANS储备耗尽时是主动训练的优选替代，且其效应存在24–72h的滞后峰。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">10</div>
+        <div class="finding-title">P07验证：绿灯+阈值内强度的效应可重复性</div>
+        <div class="finding-body">P02（MaxHR122 / 绿灯基线38.5ms → +8.3ms）与P07（MaxHR116 / 绿灯基线47.4ms → +8.2ms），在不同基线水平下产生了几乎相同的次日提升幅度。这提示：只要进入状态为绿灯且MaxHR保持在120bpm以内，普拉提私教可稳定产生约+8ms的次日ANS提升，该效应不因基线高低而显著改变。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">11</div>
+        <div class="finding-title">感冒为实验提供了一组"极端低储备"的自然对照</div>
+        <div class="finding-body">3/28–3/30感冒期（RMSSD 28.8–42.8ms，DFA α1 1.154）虽为计划外干扰，却创造了一组高价值对照数据：相同类型干预（P06 vs P02/P07）在不同储备状态下产生截然相反的结局（−3.4ms vs +8ms）；F3 vs F2在相同技术下因储备差异出现完全不同的副交感维持能力。感冒数据虽标记为"混杂"，但其对比价值不可忽视。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">12</div>
+        <div class="finding-title">旅行脱压悖论：零工作应激是最强的ANS干预</div>
+        <div class="finding-body">青岛旅行3天（4/4–4/7），期间压力0、疲劳感1，虽然因头痛/睡眠不足RMSSD曾跌至32ms，但4/7晨测达59ms（实验总峰值）。相比之下，任何单次运动干预的最大次日提升仅+8.3ms。旅行本身的ANS提升幅度（32→59，+27ms）远超所有运动干预，揭示：慢性工作应激对ANS基线的压制，是本实验中制约效果的最核心因素——运动干预的效果在被工作压力持续"顶住天花板"。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">13</div>
+        <div class="finding-title">G02次日跌幅归因：早机出行，而非团课本身</div>
+        <div class="finding-body">G02团课（4/3，MaxHR105，TRIMP22.5）次日RMSSD从55.6ms跌至44.3ms（−11.3ms）。初步归因曾指向"团课自主调节空间有限"，但记录显示4/4为早起赶飞机日——睡眠中断+交感系统被强制激活是更合理的主因。目前G02数据不能对团课本身的ANS效应下任何结论，团课的真实效应需要在无出行干扰的正常日的次日数据来验证。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">14</div>
+        <div class="finding-title">高基线进入按摩 + 心理否决 = 超补偿完全失效</div>
+        <div class="finding-body">第一次按摩（进入47ms）→ D+3 +9.4ms（超补偿）。第二次按摩（进入58.1ms）→ D+1−31.2ms（心理事件）/ D+2+6ms / D+3仅33.9ms（基线以下24ms）。两个竞争机制可能同时成立：①心理应激完全覆盖了按摩效应（同3/19机制）；②高基线进入导致均值回归空间更大，心理扰动触发了更强烈的回撤。结论：按摩的超补偿效应不具有无条件可重复性，ANS基线和心理状态的协同影响是关键调节变量。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">15</div>
+        <div class="finding-title">第二次按摩D+1崩落：高基线均值回归 vs 心理否决——归因倾向心理</div>
+        <div class="finding-body">第二次按摩（4/8，进入58.1ms）次日（4/9）RMSSD跌至26.9ms（−31.2ms），超越P03成为实验最大单日跌幅。当天同时发生心理不快事件，P08（MaxHR117/TRIMP25.6）强度远低于阈值不应是主因。D+3（4/11）仅33.9ms而非超补偿，说明ANS未能完成修复。综合来看，心理应激再次覆盖的权重更大——这是实验中第三个心理否决运动/被动干预效应的案例（3/19、4/9）。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">16</div>
+        <div class="finding-title">壁球大负荷产生最强训练超补偿：S02次日+9.8ms★</div>
+        <div class="finding-body">S02（TRIMP391.5 / Hard70.2% / VT1+78.1% / HRR60s 8.3bpm）在前夜睡眠受损（3/5）条件下完成，所有指标指向更差的恢复条件，次日（4/13）RMSSD却从35.5升至45.3ms（+9.8ms），是本实验所有训练干预中最大的次日正向效应，超过P02/P07的+8.2–8.3ms。对比S01（TRIMP185.8 / HRR60s 27.1bpm → 次日−5ms），两次壁球的结局完全相反。可能机制：S02强度更高但仍保持间歇结构，触发了更强的超补偿；S01负荷较低，刺激不足以触发正向适应。重要发现：主观感受（疲劳7/10、睡眠1/5）与客观ANS恢复（+9.8ms）之间存在显著解离，晨测RMSSD是比主观感受更可靠的就绪度指标。</div>
+      </div>
+
+      <div class="finding-card">
+        <div class="finding-num">17</div>
+        <div class="finding-title">RMSSD与DFA解离：数量正常但复杂度崩落</div>
+        <div class="finding-body">4/20晨测RMSSD 41.6ms（黄灯边界，看似尚可），但DFA α1 = 1.195（🔴红灯，非感冒期最高）。两个指标指向截然不同的结论。RMSSD衡量的是心跳间期短时变异的幅度，反映副交感张力的"量"；DFA α1衡量的是这些变异的时间结构复杂度，反映ANS调节的"质"——即神经系统是否在以灵活的分形方式响应内外环境。DFA >1.0意味着心跳变得过度规则，ANS进入"保守防御"模式而非"动态适应"模式。触发原因：4/19双高强度训练过载 + 深夜高强度社交 + 极差心情（效价2/安全感1）三重叠加，对应多重迷走神经理论中的背侧迷走激活状态（shutdown而非fight-or-flight）。这个案例表明：单看RMSSD会低估ANS的真实受损程度，DFA α1是更敏感的调节质量指标，两者结合才能完整评估就绪度。</div>
+      </div>
+
+    </div>
+  </section>
+  <div class="footer">
+    <span>ANS × Exercise Intervention Study · JiangXintong · 2026</span>
+    <span>Kubios HRV · Polar H10 · N=65 days · 30 interventions</span>
+  </div>
+
+</div><!-- end page -->
+
+<script>
+// ── Data ──────────────────────────────────────────
+const DATA = [
+// ─ SCHEMA ─────────────────────────────────────────────────────────────────
+// 晨测 (Morning): rs=RMSSD卧 ps=PNS卧 ss=SNS卧 hs=HR卧 hst=HR立 sst=SNS立
+//                 dfa=DFA_α1 lfhf=LF/HF
+// 运动 (Exercise): tp=类型 ex=名称 t=TRIMP avghr=均HR maxhr=峰HR
+//                  hard=Hard区间% vt1=VT1+% hrr60=HRR60s hrr300=HRR300s
+// Feldenkrais:     fpre_{hr,pns} fmid_{hr,sns,rmssd,dfa} fpost_{hr,pns}
+// 主观 (Subj):     slpQ=睡眠质量1-5 fat=疲劳1-10 stress=压力0-5
+// 标记 (Flags):    cr=崩落/感冒 np=新峰值
+// ─────────────────────────────────────────────────────────────────────────
+// 2月 ── Baseline
+{d:'2/24',rs:29.9,ps:0.08,ss:-0.03,hs:59,hst:73,sst:-0.92,cr:false,note:'基线参考日'},
+{d:'2/25',rs:30.5,ps:0.37,ss:0.21,hs:58,hst:78,sst:2.02,cr:false,note:'直立SNS↑↑'},
+{d:'2/26',rs:38.4,ps:0.84,ss:-0.35,hs:55,hst:68,sst:1.22,cr:false,note:''},
+{d:'2/27',rs:20.1,ps:0.37,ss:0.52,hs:53,hst:69,sst:1.14,cr:false,note:'RMSSD急跌'},
+{d:'2/28',rs:40,ps:1.00,ss:null,hs:53,hst:68,sst:-1.01,ex:'ANS综合测试*',tp:'',cr:false,note:'深呼吸HR反应8.5bpm⚠'},
+// 3月 ─────────────────────────────────────────────────────────────────────
+{d:'3/1', rs:null,cr:false,note:'缺失'},
+{d:'3/2', rs:42.8,ps:1.06,ss:-0.77,hs:53,hst:69,sst:1.33,cr:false,note:''},
+{d:'3/3', rs:46.1,ps:1.31,ss:-1.00,hs:51,hst:66,sst:1.12,cr:false,note:'自然峰值 46.1ms'},
+{d:'3/4', rs:42.1,ps:0.72,ss:-0.63,hs:56,hst:76,sst:1.31,cr:false,note:''},
+// P01 ── MaxHR117 Hard0% VT1:0% → 次日+0.9ms
+{d:'3/5', rs:41.1,ps:1.08,ss:-0.40,hs:53,hst:70,sst:1.09,
+  tp:'pilates',ex:'P01私教',t:30.5,avghr:85,maxhr:117,hard:0,vt1:0,hrr60:null,hrr300:null,
+  cr:false,note:'▲傍晚'},
+{d:'3/6', rs:42.0,ps:1.28,ss:-0.73,hs:52,hst:68,sst:1.19,cr:false,note:'P01次日+0.9ms'},
+{d:'3/7', rs:35.1,ps:0.71,ss:-0.17,hs:55,hst:75,sst:1.23,cr:false,note:'测时09:43⚠'},
+// P02 ── MaxHR122 Hard0% VT1:0% → 次日+8.3ms ★
+{d:'3/8', rs:38.5,ps:0.89,ss:-0.54,hs:54,hst:63,sst:1.31,
+  tp:'pilates',ex:'P02私教',t:43.7,avghr:93,maxhr:122,hard:0,vt1:0,hrr60:null,hrr300:null,
+  cr:false,note:'▲上午'},
+{d:'3/9', rs:46.8,ps:0.99,ss:-0.77,hs:55,hst:67,sst:0.43,cr:false,note:'P02次日+8.3ms ★'},
+{d:'3/10',rs:38.9,ps:0.41,ss:-0.22,hs:59,hst:73,sst:1.54,cr:false,note:'D+2回落'},
+{d:'3/11',rs:37.6,ps:0.41,ss:-0.45,hs:58,hst:79,sst:2.42,cr:false,note:'直立SNS⚠'},
+// P03 ── MaxHR139⚠ Hard1.6% VT1:3.1% → 次日−29.6ms ⚠
+{d:'3/12',rs:54.2,ps:1.66,ss:-1.12,hs:50,hst:72,sst:1.22,
+  tp:'pilates',ex:'P03私教',t:41.0,avghr:86,maxhr:139,hard:1.6,vt1:3.1,hrr60:null,hrr300:null,
+  cr:false,confound:'次日−29.6ms · MaxHR139超阈值+VT13.1% · 持续高强度无有效间歇',note:'▲傍晚 MaxHR139⚠'},
+// G01 团课 (P03次日崩落中训练)
+{d:'3/13',rs:24.6,ps:0.13,ss:-0.12,hs:57,hst:82,sst:2.26,
+  tp:'group',ex:'G01普拉提团课',t:23.7,
+  cr:true,note:'⚠ P03次日崩落−29.6ms'},
+// S01 壁球 ── avgHR113 MaxHR166 Hard13.9% VT121.8% HRR60s27.1bpm → 次日−5.0ms（间歇保护）
+{d:'3/14',rs:39.7,ps:0.83,ss:-0.73,hs:55,hst:69,sst:0.99,
+  tp:'squash',ex:'S01壁球',t:185.8,avghr:113,maxhr:166,hard:13.9,vt1:21.8,hrr60:27.1,hrr300:null,
+  cr:false,note:'TRIMP185.8 · Hard13.9% · VT1+21.8% · HRR60s27.1bpm · 测时10:27'},
+{d:'3/15',rs:34.7,ps:0.60,ss:-0.27,hs:56,hst:71,sst:1.22,tp:'fascia',ex:'P04筋膜松解',cr:false,note:'壁球D+1 无HR监测'},
+{d:'3/16',rs:34.1,ps:0.33,ss:-0.16,hs:58,hst:70,sst:1.32,cr:false,note:'测时10:32⚠'},
+{d:'3/17',rs:40.4,ps:0.66,ss:-0.54,hs:57,hst:82,sst:2.46,cr:false,note:'直立SNS⚠'},
+// F01 Feldenkrais ── 唯一副交感主导运动 midSNS=0.07★
+{d:'3/18',rs:37.5,ps:0.59,ss:-0.34,hs:56,hst:63,sst:0.37,
+  tp:'feld',ex:'F01 Feldenkrais',
+  fpre_sns:0.82,
+  fmid_hr:63.6,fmid_sns:0.07,
+  fpost_sns:1.38,
+  cr:false,note:'▲晚 midSNS=0.07★'},
+// P05 ── 极轻量 当晚焦虑⚠
+{d:'3/19',rs:null,
+  tp:'pilates',ex:'P05私教',t:14.4,maxhr:null,hard:null,vt1:null,
+  stress:5,cr:false,note:'无晨测 当晚焦虑'},
+{d:'3/20',rs:23.4,ps:0.29,ss:0.26,hs:55,hst:80,sst:2.00,stress:4,cr:true,note:'⚠ 焦虑应激抑制'},
+{d:'3/21',rs:29.0,ps:0.58,ss:-0.28,hs:54,hst:68,sst:1.66,cr:false,note:'测时10:01⚠'},
+{d:'3/22',rs:25.2,ps:-0.06,ss:0.19,hs:60,hst:74,sst:2.45,cr:false,note:'直立SNS⚠'},
+// 英式芳香按摩 → D+3出现56.4ms峰值
+{d:'3/23',rs:47.0,ps:1.15,ss:-0.98,hs:53,hst:78,sst:2.24,tp:'massage',ex:'英式芳香按摩',cr:false,note:'焦虑解除反弹 · 晚间英式芳香按摩'},
+{d:'3/24',rs:47.3,ps:1.70,ss:-1.27,hs:48,hst:68,sst:1.26,cr:false,note:'按摩D+1'},
+{d:'3/25',rs:44.3,ps:0.84,ss:-0.61,hs:56,hst:79,sst:2.23,cr:false,note:'按摩D+2'},
+// F02 Feldenkrais ── 高储备进入(56.4ms) pre:85/−1.40 mid:60/−0.57 post:68/−0.53
+{d:'3/26',rs:56.4,ps:1.68,ss:-1.33,hs:51,hst:71,sst:1.10,dfa:0.766,lfhf:0.316,
+  tp:'feld',ex:'F02 Feldenkrais',
+  fpre_hr:85,fpre_pns:-1.40,fpre_sns:1.88,fpre_rmssd:29.1,
+  fmid_hr:60,fmid_pns:0.18,fmid_sns:-0.57,fmid_rmssd:36.2,
+  fpost_hr:68,fpost_pns:-0.53,fpost_sns:0.45,fpost_rmssd:29.2,
+  np:true,cr:false,note:'★ 实验峰值56.4ms · 按摩D+3超补偿'},
+{d:'3/27',rs:46.8,ps:0.97,ss:-0.63,hs:55,hst:81,sst:2.07,cr:false,note:'F02次日−9.6ms'},
+// 感冒发作
+{d:'3/28',rs:42.8,ps:1.29,ss:-0.77,hs:51,hst:74,sst:1.77,cr:true,note:'⚠ 感冒发作 · 消炎药'},
+// P06 ── 感冒混杂⚠ MaxHR131 VT1:5.7% HRR60:44.6
+{d:'3/29',rs:32.2,ps:0.15,ss:-0.04,hs:60,hst:81,sst:2.15,dfa:1.154,lfhf:0.996,
+  tp:'pilates',ex:'P06私教(感冒后⚠)',t:72.3,avghr:106,maxhr:131,hard:3.1,vt1:5.7,hrr60:44.6,hrr300:48.9,
+  cr:true,note:'⚠ 感冒混杂 数据无效'},
+// F03 Feldenkrais ── 低储备(28.8ms) pre:87/−1.89 mid:59/−0.35/DFA1.26⚠ post:83/−1.68
+{d:'3/30',rs:28.8,ps:0.37,ss:-0.12,hs:57,hst:77,sst:2.04,
+  tp:'feld',ex:'F03 Feldenkrais',
+  fpre_hr:87,fpre_pns:-1.89,fpre_sns:2.66,fpre_rmssd:15.5,
+  fmid_hr:59,fmid_pns:0.15,fmid_sns:-0.35,fmid_rmssd:33.2,fmid_dfa:1.26,
+  fpost_hr:83,fpost_pns:-1.68,fpost_sns:2.06,fpost_rmssd:17.5,
+  cr:false,note:'感冒恢复期 低储备 副交感无法维持'},
+// 中医针灸+艾灸
+{d:'3/31',rs:43.2,ps:1.08,ss:-0.45,hs:54,hst:74,sst:1.81,tp:'fascia',ex:'针灸+艾灸',dfa:0.674,lfhf:0.695,cr:false,note:'中午中医针灸+艾灸 · 感冒后反弹+14.4ms'},
+// 4月 ─────────────────────────────────────────────────────────────────────
+// 首次3min仰卧测量
+{d:'4/1', rs:41.1,ps:0.82,ss:-0.75,hs:55,hst:77,sst:2.25,dfa:0.886,lfhf:1.129,stress:1,cr:false,note:'首次3min测量 · 针灸后D+1'},
+// P07 ── MaxHR116 Hard0% VT1:0% 感冒后首次绿灯训练
+{d:'4/2', rs:47.4,ps:1.33,ss:-1.06,hs:52,hst:73,sst:2.69,
+  tp:'pilates',ex:'P07私教',t:38.7,avghr:93,maxhr:116,hard:0,vt1:0,hrr60:null,hrr300:null,dfa:0.834,lfhf:1.577,
+  slpQ:4,stress:1,fat:3,cr:false,note:'感冒后首次绿灯训练 · MaxHR116 TRIMP38.7 Hard0%'},
+// G02 团课(下午) ── MaxHR105 TRIMP22.5 P07次日+8.2ms★
+{d:'4/3', rs:55.6,ps:1.89,ss:-1.19,hs:49,hst:67,sst:1.33,
+  tp:'group',ex:'G02普拉提团课',t:22.5,avghr:null,maxhr:105,hard:null,vt1:null,dfa:0.489,lfhf:0.233,
+  slpQ:3,stress:1,fat:1,np:true,cr:false,note:'P07次日+8.2ms★ · MaxHR105 TRIMP22.5'},
+// ── 4/4–4/8 青岛旅行 + 第二次按摩 ─────────────────────────────────────────
+// G02次日−11.3ms · 飞往青岛
+{d:'4/4', rs:44.3,ps:1.13,ss:-0.61,hs:53,hst:70,sst:1.21,
+  tp:'travel',ex:'✈青岛',dfa:0.58,lfhf:0.252,slpQ:3,stress:1,fat:3,cr:false,note:'G02次日−11.3ms · ✈飞往青岛'},
+// 青岛旅行D+1 · 风吹头痛⚠
+{d:'4/5', rs:33.3,ps:0.4,ss:-0.16,hs:57,hst:78,sst:2.62,
+  tp:'travel',ex:'✈青岛',dfa:0.761,lfhf:0.783,slpQ:3,stress:0,fat:1,cr:true,note:'⚠头痛(风吹) · 旅行一整天'},
+// 青岛旅行D+2
+{d:'4/6', rs:32.3,ps:0.47,ss:-0.54,hs:55,hst:74,sst:2.72,
+  tp:'travel',ex:'✈青岛',dfa:1.205,lfhf:0.736,slpQ:3,stress:0,fat:1,cr:false,note:'✈在青岛旅行'},
+// 旅行D+3 → 全实验新峰值59ms★★ 当晚返穗
+{d:'4/7', rs:59,ps:1.9,ss:-1.33,hs:50,hst:71,sst:1.41,
+  tp:'travel',ex:'✈返穗',dfa:0.642,lfhf:0.621,slpQ:4,stress:0,fat:1,np:true,cr:false,note:'★★ 全实验新峰值 · 旅行D+3 · 当晚返回广州'},
+// 第二次英式芳香按摩90min · 高基线58.1ms
+{d:'4/8', rs:58.1,ps:2.0,ss:-1.53,hs:49,hst:74,sst:2.23,
+  tp:'massage',ex:'英式芳香按摩',dfa:0.679,lfhf:0.653,slpQ:4,stress:0,fat:1,np:true,cr:false,note:'第二次英式芳香按摩90min · PNS+2.0创新高'},
+// 按摩D+1 → 崩落31.2ms⚠ 心理事件否决 + P08傍晚训练
+{d:'4/9', rs:26.9,ps:0.42,ss:-0.43,hs:54,hst:78,sst:2.31,
+  tp:'pilates',ex:'P08私教',t:25.6,avghr:null,maxhr:117,hard:0,vt1:0,hrr60:null,hrr300:null,dfa:1.078,lfhf:1.41,
+  slpQ:4,stress:1,fat:1,cr:false,confound:'次日−31.2ms · 高基线均值回归+当晚心理事件双重叠加',note:'按摩D+1崩落−31.2ms · P08傍晚MaxHR117 TRIMP25.6 · 当晚心理事件'},
+// 按摩D+2 · 今日针灸+艾灸 · 睡前反思严重
+{d:'4/10',rs:32.9,ps:0.66,ss:-0.18,hs:55,hst:76,sst:1.84,
+  tp:'fascia',ex:'针灸+艾灸',dfa:0.735,lfhf:0.455,
+  slpQ:3,stress:1,fat:1,cr:false,note:'按摩D+2 +6.0ms · 睡前反思严重 · 今日针灸+艾灸'},
+// 按摩D+3 = 33.9ms（vs 第一次D+3=56.4ms）· 立位SNS⚠3.9 · 当晚聚会到深夜
+{d:'4/11',rs:33.9,ps:0.53,ss:-0.24,hs:56,hst:82,sst:3.9,dfa:0.978,lfhf:1.891,
+  slpQ:4,stress:0,fat:1,cr:false,note:'按摩D+3仅33.9ms（第一次D+3=56.4ms）· 立位SNS 3.9⚠ · 当晚聚会到深夜'},
+// S02 壁球 ── 前夜聚会睡眠3/5 · TRIMP391.5↑↑ MaxHR178 avgHR138 Hard70.2% VT178.1%
+{d:'4/12',rs:35.5,ps:0.5,ss:-0.03,hs:57,hst:76,sst:1.83,
+  tp:'squash',ex:'S02壁球',t:391.5,avghr:138,maxhr:178,hard:70.2,vt1:78.1,hrr60:8.3,hrr300:null,dfa:0.872,lfhf:0.837,
+  slpQ:3,stress:0,fat:1,cr:false,note:'前夜聚会→睡眠3/5 · Hard70.2% · VT1以上78.1% · HRR60s仅8.3bpm⚠'},
+// S02次日 +9.8ms★ · 睡眠极差(1/5)中断多 · 今日英式按摩 · DFA0.9黄灯
+{d:'4/13',rs:45.3,ps:1.36,ss:-1.04,hs:51,hst:72,sst:2.01,dfa:0.9,lfhf:0.996,
+  tp:'massage',ex:'经络按摩',
+  slpDur:'7h 4min',slpDeep:'1h 4min',slpRem:'1h 42min',slpBed:'00:59',slpUp:'08:02',
+  slpQ:1,fat:7,stress:0,cr:false,note:'S02次日+9.8ms★ · 睡眠中断多/质量1/5⚠ · 今日经络按摩 · DFA0.9黄灯'},
+// 经络按摩D+1 · 体验巴西柔术(BJJ首次) · 站立数据缺失
+{d:'4/14',rs:37.5,ps:1.1,ss:-0.43,hs:52,hst:null,sst:null,dfa:0.729,lfhf:0.401,
+  tp:'other',ex:'BJJ柔术体验',
+  slpDur:'6h 25min',slpDeep:'1h 58min',slpRem:'1h 10min',slpBed:'01:35',slpUp:'08:00',
+  slpQ:3,fat:3,stress:1,valence:3,arousal:3,safety:3,cr:false,note:'首次体验巴西柔术 · 站立段数据缺失'},
+// 团课(傍晚) · MaxHR99 TRIMP21.1 · 全程低于VT1 · 晚间焦虑性进食
+{d:'4/15',rs:47.3,ps:1.23,ss:-1.09,hs:53,hst:72,sst:1.49,dfa:0.759,lfhf:0.325,
+  tp:'group',ex:'G03普拉提团课',t:21.1,avghr:78,maxhr:99,hard:null,vt1:0,
+  slpDur:'7h 22min',slpDeep:'1h 18min',slpRem:'1h 45min',slpBed:'00:38',slpUp:'08:00',
+  slpQ:3,fat:5,stress:1,valence:3,arousal:3,safety:3,cr:false,note:'全程below VT1 · 焦虑性进食→深夜才睡'},
+// 无训练 · 睡前焦虑+焦虑性进食
+{d:'4/16',rs:37.9,ps:0.27,ss:0.09,hs:61,hst:71,sst:1.75,dfa:0.808,lfhf:0.344,
+  slpDur:'6h 59min',slpDeep:'1h 6min',slpRem:'1h 54min',slpBed:'01:11',slpUp:'08:10',
+  slpQ:3,fat:5,stress:1,valence:3,arousal:3,safety:3,cr:false,note:'睡前轻度焦虑 · 深夜焦虑性进食'},
+// 针灸+艾灸（tp:fascia，非按摩）
+{d:'4/17',rs:40.4,ps:0.99,ss:-0.44,hs:53,hst:68,sst:1.59,dfa:0.699,lfhf:0.467,
+  tp:'fascia',ex:'针灸+艾灸',
+  slpDur:'7h 48min',slpDeep:'1h 12min',slpRem:'1h 33min',slpBed:'00:31',slpUp:'08:19',
+  slpQ:3,fat:5,stress:1,valence:4,arousal:3,safety:3,cr:false,note:'针灸+艾灸'},
+// 无训练 · 朋友晚餐开心 · Polar记录5h34min + 早起后补睡3h ≈ 实际睡眠8h+
+{d:'4/18',rs:46.2,ps:1.36,ss:-1.06,hs:51,hst:64,sst:0.88,dfa:0.881,lfhf:0.503,
+  slpDur:'5h 34min',slpDeep:'1h 9min',slpRem:'1h 33min',slpBed:'00:17',slpUp:'05:50',
+  slpQ:4,fat:3,stress:0,valence:4,arousal:4,safety:4,cr:false,note:'朋友晚餐高社交连接感 · Polar记5h34min但早起后补睡3h · 实际睡眠≈8h'},
+// ⚠ 双训练日（实验首次）· 昨晚聚会喝茶→深夜入睡 · 睡眠1/5极差
+// P09私教上午 MaxHR136⚠超阈值 Hard2.9% VT1以上15.5% | S03壁球傍晚 MaxHR165 Hard63.4% VT1以上77%
+{d:'4/19',rs:34.1,ps:0.81,ss:-0.76,hs:53,hst:78,sst:2.86,dfa:0.954,lfhf:1.85,
+  tp:'pilates',ex:'P09私教+S03壁球',
+  t:80.8,avghr:111,maxhr:136,hard:2.9,vt1:15.5,hrr60:17.2,hrr300:30.5,
+  t2:361.8,avghr2:137,maxhr2:165,hard2:63.4,vt12:77,hrr60_2:2.9,hrr300_2:47.2,
+  slpDur:'7h 19min',slpDeep:'51min',slpRem:'1h 14min',slpBed:'02:16',slpUp:'09:35',
+  slpQ:1,fat:9,stress:0,valence:2,arousal:2,safety:1,cr:false,confound:'次日DFA1.195🔴 · 双高强度训练过载+深夜入睡02:16+心情极差三重叠加',
+  note:'⚠ 双训练日 · 前夜聚会茶→入睡02:16 · P09 MaxHR136⚠ Hard2.9% VT115.5% · S03 TRIMP361.8 Hard63.4% VT177%'},
+// 第三次英式芳香按摩 · DFA1.195🔴（非感冒期最高）· 情绪极低（效价1/安全感2）
+// 4/19双高强度训练+高强度社交+心情极差→ANS调节复杂度崩落
+{d:'4/20',rs:41.6,ps:0.98,ss:-0.97,hs:53,hst:77,sst:2.58,dfa:1.195,lfhf:1.586,
+  tp:'massage',ex:'英式芳香按摩',
+  slpDur:'7h 48min',slpDeep:'1h 12min',slpRem:'1h 33min',slpBed:'00:31',slpUp:'08:19',
+  slpQ:3,fat:5,stress:0,valence:1,arousal:1,safety:2,cr:false,
+  note:'⚠ DFA1.195🔴非感冒期最高 · 双训练过载+心理低谷→ANS复杂度崩落 · 第三次英式按摩 · RMSSD与DFA严重解离'},
+// 按摩D+1 · 瑜伽(傍晚) · 首次正念练习13min · RMSSD反弹+8.4ms DFA改善
+{d:'4/21',rs:50,ps:1.71,ss:-1.33,hs:49,hst:69,sst:0.95,dfa:0.974,lfhf:1.575,
+  tp:'yoga',ex:'瑜伽+冥想',
+  fpre_hr:84,fpre_pns:1.80,fpre_rmssd:15.3,fpre_dfa:1.483,
+  fmid_hr:69,fmid_pns:-0.88,fmid_sns:1.13,fmid_rmssd:20.4,fmid_dfa:1.436,
+  slpDur:'6h 2min',slpDeep:'1h 6min',slpRem:'1h 15min',slpBed:'01:58',slpUp:'08:00',
+  slpQ:4,fat:1,stress:1,valence:3,arousal:4,safety:3,rumination:2,resilience:4,
+  mindful:null,meditate:13,cr:false,
+  note:'按摩D+1 +8.4ms · 瑜伽课后即刻冥想13min · MaxHR115 · DFA0.974从1.195改善'},
+// 按摩D+2 · 瑜伽拉伸50min+课后冥想13min · 54.7ms★4月新高 · DFA继续改善
+{d:'4/22',rs:54.7,ps:1.92,ss:-1.32,hs:48,hst:70,sst:2.0,dfa:0.94,lfhf:1.203,
+  tp:'yoga',ex:'瑜伽拉伸',t:null,avghr:null,maxhr:null,hard:null,vt1:null,
+  slpDur:'6h 30min',slpDeep:'1h 0min',slpRem:'1h 14min',slpBed:'00:43',slpUp:'07:13',
+  slpQ:4,fat:1,stress:1,valence:3,arousal:4,safety:3,rumination:3,resilience:4,
+  meditate:13,np:true,cr:false,
+  note:'按摩D+2 +4.7ms · 54.7ms★4月新高 · 瑜伽拉伸50min+课后冥想13min · DFA0.94持续改善'},
+// P10私教(下午) · MaxHR125⚠恰好踩阈值 · VT10% · 出差海口
+{d:'4/23',rs:52.7,ps:1.86,ss:-1.29,hs:48,hst:65,sst:1.06,dfa:0.773,lfhf:1.095,
+  tp:'pilates',ex:'P10私教',t:38.5,avghr:91,maxhr:125,hard:null,vt1:0,hrr60:20.9,hrr300:null,
+  slpDur:'6h 1min',slpDeep:'1h 21min',slpRem:'1h 14min',slpBed:'00:53',slpUp:'06:54',
+  slpQ:4,fat:1,stress:1,valence:4,arousal:4,safety:4,rumination:1,resilience:4,
+  cr:false,confound:'次日−7.9ms · 当晚出差海口（睡眠压缩+环境应激）',note:'✈飞海口出差 · P10 MaxHR125⚠恰好踩阈值'},
+// 瑜伽+冥想(晚间) · 出差返穗 · HRV报告: 练习SNS0.68 冥想DFA1.053⚠
+{d:'4/24',rs:44.8,ps:1.25,ss:-0.87,hs:52,hst:69,sst:1.37,dfa:0.878,lfhf:1.419,
+  tp:'yoga',ex:'瑜伽+冥想',
+  fpre_hr:77,fpre_pns:1.11,fpre_rmssd:21.2,fpre_dfa:1.458,
+  fmid_hr:65,fmid_pns:-0.43,fmid_sns:0.68,fmid_rmssd:24.0,fmid_dfa:1.053,
+  slpDur:'5h 32min',slpDeep:'51min',slpRem:'1h 55min',slpBed:'01:13',slpUp:'06:45',
+  slpQ:4,fat:1,stress:1,valence:3,arousal:2,safety:4,rumination:1,meditate:13,
+  cr:false,note:'✈海口→广州出差返回 · 冥想段DFA1.053⚠副交感维持受限'},
+// ★★ 全实验新高 65.9ms · 瑜伽+冥想 · 五维情绪全满(5/5/5/0) · 冥想DFA0.859🟢
+{d:'4/25',rs:65.9,ps:2.41,ss:-1.49,hs:47,hst:62,sst:0.78,dfa:0.755,lfhf:0.373,
+  tp:'yoga',ex:'瑜伽+冥想',
+  fpre_hr:73,fpre_pns:0.71,fpre_rmssd:24.2,fpre_dfa:1.253,
+  fmid_hr:58,fmid_pns:0.43,fmid_sns:-0.19,fmid_rmssd:34.7,fmid_dfa:0.859,
+  slpDur:'6h 27min',slpDeep:'51min',slpRem:'1h 25min',slpBed:'00:47',slpUp:'07:14',
+  slpQ:4,fat:1,stress:1,alcohol:1,valence:5,arousal:5,safety:5,rumination:0,
+  np:true,cr:false,confound:'次日−18.9ms · 当晚睡前少量饮酒（alcohol:1）可能抑制深睡眠修复',note:'★★ 全实验新高65.9ms · 情绪五维全满 · DFA0.755🟢 · 晚间少量饮酒'},
+// S04壁球(下午) · TRIMP473.3↑↑ MaxHR185 VT1以上82.5% · HRR60s仅2.9bpm⚠
+{d:'4/26',rs:47,ps:1.25,ss:-0.63,hs:53,hst:69,sst:2.09,dfa:0.708,lfhf:0.425,
+  tp:'squash',ex:'S04壁球',t:473.3,avghr:144,maxhr:185,hard:null,vt1:82.5,hrr60:2.9,hrr300:null,
+  slpDur:'5h 20min',slpDeep:'1h 0min',slpRem:'57min',slpBed:'00:22',slpUp:'05:41',
+  slpQ:4,fat:1,stress:1,alcohol:1,valence:5,arousal:5,safety:5,rumination:0,
+  cr:false,note:'TRIMP473.3（实验最高）· MaxHR185 · VT1以上82.5% · 晚间少量饮酒'},
+// 瑜伽+冥想(上午) · S04次日数据 · DFA0.829
+{d:'4/27',rs:49.6,ps:1.47,ss:-1.12,hs:51,hst:69,sst:1.1,dfa:0.829,lfhf:0.862,
+  tp:'yoga',ex:'瑜伽+冥想',
+  fpre_hr:83,fpre_pns:1.76,fpre_rmssd:17.2,fpre_dfa:1.426,
+  fmid_hr:63,fmid_pns:-0.06,fmid_sns:0.19,fmid_rmssd:32.1,fmid_dfa:0.934,
+  slpDur:'7h 0min',slpDeep:'1h 28min',slpRem:'2h 1min',slpBed:'00:41',slpUp:'07:40',
+  slpQ:4,fat:1,stress:1,valence:5,arousal:5,safety:4,rumination:1,meditate:13,
+  cr:false,note:'S04壁球次日 · 瑜伽+冥想13min'},
+// G04普拉提团课(下午) + 瑜伽+冥想(晚) · 双训练日 · ⚠情绪低谷(效价1/安全感2/反刍4)
+{d:'4/28',rs:53.4,ps:1.85,ss:-1.21,hs:49,hst:67,sst:1.67,dfa:0.891,lfhf:1.007,
+  tp:'group',ex:'G04普拉提团课+瑜伽冥想',
+  t:18.5,avghr:77,maxhr:91,hard:null,vt1:0,hrr60:null,hrr300:null,
+  fpre_hr:87,fpre_pns:-1.88,fpre_rmssd:null,fpre_dfa:null,
+  fmid_hr:61,fmid_pns:-0.23,fmid_sns:null,fmid_rmssd:28.6,fmid_dfa:0.984,
+  slpBed:'00:15',slpUp:'06:00',
+  slpQ:4,fat:1,stress:3,valence:1,arousal:2,safety:2,rumination:4,resilience:2,
+  meditate:13,cr:false,
+  note:'中午G04团课 → 下午心理情绪低谷事件 → 晚上瑜伽冥想针对性干预 · MaxHR91 · 冥想段DFA0.984🟡'},
+// G04+瑜伽冥想次日 · ★68.9ms全实验新高 · 双报告差12.4ms(静息68.9 vs 正位56.5) · 取静息高值
+{d:'4/29',rs:56.5,ps:2.01,ss:-1.41,hs:47,hst:62,sst:0.70,dfa:0.782,lfhf:0.538,
+  tp:'yoga',ex:'瑜伽+冥想',
+  fpre_hr:81,fpre_pns:-1.5,fmid_hr:67,fmid_sns:0.03,fmid_rmssd:28.4,fmid_dfa:1.22,
+  slpDur:'5h 48min',slpDeep:'2h 8min',slpRem:'1h 1min',slpBed:'00:20',slpUp:'06:07',
+  slpQ:4,fat:1,stress:1,valence:4,arousal:4,safety:4,rumination:1,resilience:4,
+  meditate:13,cr:false,
+  note:'正位S1: 56.5ms · 静息报告68.9ms(近入睡，不纳入序列) · 冥想段DFA1.22⚠'},
+// P11私教(傍晚) · 爬山日 · 静息78.4ms取高值(近入睡状态测量) · DFA1.064⚠解离
+{d:'4/30',rs:53.2,ps:1.57,ss:-1.26,hs:51,hst:77,sst:2.10,dfa:0.717,lfhf:0.674,
+  tp:'pilates',ex:'P11私教',t:48.6,avghr:98,maxhr:119,hard:null,vt1:null,hrr60:null,hrr300:null,
+  slpDur:'6h 36min',slpDeep:'1h 36min',slpRem:'1h 54min',slpBed:'00:42',slpUp:'07:18',
+  slpQ:3,fat:3,stress:0,valence:4,arousal:3,safety:3,
+  cr:false,note:'正位S1: 53.2ms · 静息报告78.4ms(近入睡，不纳入序列) · 今日爬山+P11 MaxHR119'},
+];
+
+// ── Calendar ──────────────────────────────────────
+function buildCal() {
+  const byD = {};
+  DATA.forEach(d => { byD[d.d] = d; });
+  const months = [{n:'2月',m:2,days:28},{n:'3月',m:3,days:31},{n:'4月',m:4,days:30},{n:'5月',m:5,days:31}];
+  const dow = ['日','一','二','三','四','五','六'];
+  const container = document.getElementById('cal-container');
+  const wrap = document.createElement('div');
+  wrap.className = 'cal-wrap';
+
+  months.forEach(mo => {
+    const col = document.createElement('div');
+    col.className = 'cal-month';
+    const nameEl = document.createElement('div');
+    nameEl.className = 'cal-month-name';
+    nameEl.textContent = `2026年${mo.n}`;
+    col.appendChild(nameEl);
+    const dowRow = document.createElement('div');
+    dowRow.className = 'cal-dow-row';
+    dow.forEach(l => { const d = document.createElement('div'); d.className = 'cal-dow'; d.textContent = l; dowRow.appendChild(d); });
+    col.appendChild(dowRow);
+    const grid = document.createElement('div');
+    grid.className = 'cal-grid';
+    const start = new Date(2026, mo.m - 1, 1).getDay();
+    for (let i = 0; i < start; i++) {
+      const e = document.createElement('div');
+      e.className = 'cal-cell cal-empty';
+      grid.appendChild(e);
+    }
+    for (let d = 1; d <= mo.days; d++) {
+      const key = `${mo.m}/${d}`;
+      const r = byD[key];
+      const cell = document.createElement('div');
+      cell.className = 'cal-cell';
+      if (!r) { cell.className += ' cal-future'; cell.textContent = d; }
+      else if (r.rs === null && !r.ex) { cell.className += ' cal-miss'; cell.textContent = d; }
+      else {
+        const v = r.rs;
+        if (v === null) cell.className += ' cal-miss';
+        else if (v > 35) cell.className += ' c-ex35';
+        else if (v > 25) cell.className += ' c-25';
+        else if (v > 15) cell.className += ' c-15';
+        else cell.className += ' c-lo';
+
+        if (r.cr) cell.className += ' mark-crash';
+        if (r.np) cell.className += ' mark-newpeak';
+        if (r.tp === 'pilates') cell.className += ' mark-pilates';
+        else if (r.tp === 'feld') cell.className += ' mark-feld';
+        else if (r.tp === 'massage') cell.className += ' mark-massage';
+        else if (r.tp === 'travel') cell.className += ' mark-travel';
+        else if (r.tp === 'fascia') cell.className += ' mark-fascia';
+        else if (r.tp === 'squash') cell.className += ' mark-squash';
+        else if (r.tp === 'group') cell.className += ' mark-group';
+        else if (r.tp === 'yoga') cell.className += ' mark-yoga';
+
+        cell.textContent = d;
+        const trainInfo = d.tp === 'pilates' && d.maxhr ? ` MaxHR${d.maxhr}` : d.tp === 'feld' && d.fmid_sns != null ? ` 课中SNS${d.fmid_sns}` : '';
+        const tooltip = `${r.d}  RMSSD: ${r.rs ?? '—'}ms | PNS: ${r.ps ?? '—'} | DFA: ${r.dfa ?? '—'}\n${r.tp ? r.ex||r.tp : ''}${trainInfo}\n${r.note || ''}`;
+        cell.title = tooltip;
+      }
+      grid.appendChild(cell);
+    }
+    col.appendChild(grid);
+    wrap.appendChild(col);
+  });
+  container.appendChild(wrap);
+}
+buildCal();
+
+// ── Dynamic Exercise Section ──────────────────────
+(function buildExSection() {
+  const container = document.getElementById('ex-section-container');
+  if (!container) return;
+
+  // Group sessions by type category
+  const groups = [
+    { key: 'pilates', label: '普拉提私教', color: '#1a5fa8', bg: '#e5eef9' },
+    { key: 'feld',    label: '身心干预 · Feldenkrais / 瑜伽', color: '#2d7a4f', bg: '#e8f5ee' },
+    { key: 'squash',  label: '壁球',                         color: '#b5620a', bg: '#fdf0e0' },
+    { key: 'massage', label: '按摩 · 身体治疗',               color: '#d4537e', bg: '#fce8f3' },
+    { key: 'fascia',  label: '筋膜 · 针灸 · 其他',            color: '#6b3fa0', bg: '#f0eaf9' },
+    { key: 'group',   label: '团课',                          color: '#888',    bg: '#f0f0f0' },
+    { key: 'travel',  label: '旅行',       color: '#1a7a6e', bg: '#e1f5ee' },
+  ];
+
+  // Compute next-day ΔRMSSD for each entry
+  function getDelta(idx) {
+    const cur = DATA[idx];
+    if (!cur.rs) return null;
+    for (let i = idx+1; i < DATA.length; i++) {
+      if (DATA[i].rs != null) return +(DATA[i].rs - cur.rs).toFixed(1);
+    }
+    return null;
+  }
+
+  // Color helpers
+  const c = (v, good, warn) => v != null && v <= good ? 'color:var(--green)' : v != null && v <= warn ? '' : v != null ? 'color:var(--red)' : '';
+  const signStr = v => v != null ? (v > 0 ? '+' : '') + v : '—';
+  const deltaColor = d => d == null ? '' : d > 3 ? 'color:var(--green)' : d > 0 ? 'color:var(--green)' : d > -5 ? 'color:var(--amber)' : 'color:var(--red)';
+
+  groups.forEach(grp => {
+    const sessions = DATA.map((d,i) => ({...d, _idx:i})).filter(d => {
+      if (grp.key === 'squash') return d.tp === 'squash' || (d.tp === 'pilates' && d.t2 != null);
+      if (grp.key === 'feld')   return d.tp === 'feld' || d.tp === 'yoga' || (d.fpre_hr != null && d.fmid_hr != null);
+      return d.tp === grp.key;
+    });
+    if (!sessions.length) return;
+
+    // Group header
+    const header = document.createElement('div');
+    header.style.cssText = `font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:${grp.color};margin:20px 0 10px;display:flex;align-items:center;gap:10px;`;
+    header.innerHTML = `<span>${grp.label}</span><span style="flex:1;height:1px;background:${grp.color};opacity:.3"></span>`;
+    container.appendChild(header);
+
+    // Cards grid
+    const grid = document.createElement('div');
+    grid.className = 'ex-grid';
+    container.appendChild(grid);
+
+    sessions.forEach(d => {
+      const delta = getDelta(d._idx);
+      const card = document.createElement('div');
+      const hasCrash = d.cr;
+      const isDual = d.t2 != null; // dual-session day
+      const borderCol = hasCrash ? '#b52828' : d.np ? '#1a1916' : grp.color;
+      card.className = 'ex-card';
+      card.style.cssText = `border-color:${borderCol};border-width:${hasCrash||d.np?'1.5':'0.5'}px`;
+
+      // For dual-session pilates entry, show only pilates data in pilates card
+      // Squash card for the same day will be handled in squash group via dual-session injection
+      const useSecondary = grp.key === 'squash' && isDual && d.tp === 'pilates';
+      const maxhr_show = useSecondary ? d.maxhr2 : d.maxhr;
+      const trimp_show = useSecondary ? d.t2 : d.t;
+      const avghr_show = useSecondary ? d.avghr2 : d.avghr;
+      const hard_show  = useSecondary ? d.hard2 : d.hard;
+      const vt1_show   = useSecondary ? d.vt12 : d.vt1;
+      const hrr60_show = useSecondary ? d.hrr60_2 : d.hrr60;
+      const exName     = useSecondary ? 'S03壁球（双训练日）' : d.ex||d.tp;
+
+      // Build card HTML based on type
+      let rows = '';
+      if (grp.key === 'pilates' || grp.key === 'squash' || grp.key === 'group' || grp.key === 'yoga') {
+        const mhCol = maxhr_show > 130 ? 'color:var(--red)' : maxhr_show > 120 ? 'color:var(--amber)' : 'color:var(--green)';
+        const hardCol = hard_show > 5 ? 'color:var(--red)' : hard_show > 0 ? 'color:var(--amber)' : '';
+        rows = `
+          <div class="ex-row"><span>进入 RMSSD</span><span class="val">${d.rs != null ? d.rs+'ms' : '—'}</span></div>
+          <div class="ex-row"><span>TRIMP</span><span class="val" style="${trimp_show>100?'color:var(--amber)':''}">${trimp_show != null ? trimp_show : '—'}</span></div>
+          <div class="ex-row"><span>均值 HR</span><span class="val">${avghr_show ? avghr_show+'bpm' : '—'}</span></div>
+          <div class="ex-row"><span>Max HR</span><span class="val" style="${mhCol}">${maxhr_show ? maxhr_show+'bpm' : '—'}</span></div>
+          <div class="ex-row"><span>Hard 区间</span><span class="val" style="${hardCol}">${hard_show != null ? hard_show+'%' : '—'}</span></div>
+          <div class="ex-row"><span>VT1 以上</span><span class="val" style="${vt1_show>5?'color:var(--amber)':''}">${vt1_show != null ? vt1_show+'%' : '—'}</span></div>
+          ${hrr60_show ? `<div class="ex-row"><span>HRR 60s</span><span class="val">${hrr60_show}bpm</span></div>` : ''}
+          ${hasCrash ? '<div style="margin-top:4px;font-size:10px;color:var(--red)">⚠ 数据无效（混杂）</div>' : ''}
+          ${isDual ? '<div style="margin-top:4px;font-size:10px;color:var(--purple)">⚡ 双训练日</div>' : ''}`;
+      } else if (grp.key === 'feld') {
+        const isYoga = d.tp === 'yoga' || (d.fpre_hr != null && d.fmid_hr != null && d.tp !== 'feld');
+        const preHR = d.fpre_hr||'—', midHR = d.fmid_hr||'—', postHR = d.fpost_hr||'—';
+        const hrDrop = d.fpre_hr && d.fmid_hr ? (d.fpre_hr > d.fmid_hr ? '↓'+(d.fpre_hr-d.fmid_hr) : '↑'+(d.fmid_hr-d.fpre_hr)) : '';
+        const midDfaCol = d.fmid_dfa > 1.0 ? 'color:var(--red)' : d.fmid_dfa ? 'color:var(--green)' : '';
+        const postCol = d.fpost_hr && d.fpre_hr && d.fpost_hr < d.fpre_hr ? 'color:var(--green)' : 'color:var(--amber)';
+        if (isYoga) {
+          const switchBpm = d.fpre_hr && d.fmid_hr ? d.fpre_hr - d.fmid_hr : null;
+          const preDfaCol = d.fpre_dfa > 1.3 ? 'color:var(--red)' : d.fpre_dfa > 1.0 ? 'color:var(--amber)' : '';
+          const midDfaCol2 = d.fmid_dfa > 1.0 ? 'color:var(--red)' : d.fmid_dfa < 0.9 ? 'color:var(--green)' : '';
+          const midPnsCol = d.fmid_pns != null && d.fmid_pns > 0 ? 'color:var(--green);font-weight:600' : d.fmid_pns != null && d.fmid_pns > -0.5 ? 'color:var(--green)' : '';
+          rows = `
+            <div class="ex-row"><span>进入 RMSSD</span><span class="val">${d.rs != null ? d.rs+'ms' : '—'}</span></div>
+            <div style="font-size:9px;color:var(--ink3);margin:4px 0 2px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em">练习段 S1</div>
+            <div class="ex-row"><span>HR</span><span class="val">${d.fpre_hr ? d.fpre_hr+'bpm' : '—'}</span></div>
+            <div class="ex-row"><span>SNS</span><span class="val">${d.fpre_pns != null ? (d.fpre_pns>=0?'+':'')+d.fpre_pns : '—'}</span></div>
+            <div class="ex-row"><span>RMSSD</span><span class="val">${d.fpre_rmssd ? d.fpre_rmssd+'ms' : '—'}</span></div>
+            <div class="ex-row"><span>DFA α1</span><span class="val" style="${preDfaCol}">${d.fpre_dfa || '—'}</span></div>
+            <div style="font-size:9px;color:var(--ink3);margin:6px 0 2px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em">冥想段 S2</div>
+            <div class="ex-row"><span>HR</span><span class="val" style="color:var(--green)">${d.fmid_hr ? d.fmid_hr+'bpm'+(switchBpm?' ↓'+switchBpm:'') : '—'}</span></div>
+            <div class="ex-row"><span>PNS</span><span class="val" style="${midPnsCol}">${d.fmid_pns != null ? (d.fmid_pns>=0?'+':'')+d.fmid_pns : '—'}</span></div>
+            <div class="ex-row"><span>SNS</span><span class="val">${d.fmid_sns != null ? (d.fmid_sns>=0?'+':'')+d.fmid_sns : '—'}</span></div>
+            <div class="ex-row"><span>RMSSD</span><span class="val">${d.fmid_rmssd ? d.fmid_rmssd+'ms' : '—'}</span></div>
+            <div class="ex-row"><span>DFA α1</span><span class="val" style="${midDfaCol2}">${d.fmid_dfa || '—'}</span>`;
+        } else {
+          // Feldenkrais: pre/mid/post 3-phase
+          rows = `
+            <div class="ex-row"><span>进入 RMSSD</span><span class="val">${d.rs != null ? d.rs+'ms' : '—'}</span></div>
+            <div class="ex-row"><span>进入→课中→结束 HR</span><span class="val" style="font-size:10px">${preHR}→<span style="color:var(--green)">${midHR}</span>→<span style="${postCol}">${postHR}</span> bpm ${hrDrop}</span></div>
+            <div class="ex-row"><span>课前 PNS</span><span class="val">${d.fpre_pns != null ? (d.fpre_pns>=0?'+':'')+d.fpre_pns : '—'}</span></div>
+            <div class="ex-row"><span>课中 SNS</span><span class="val" style="${d.fmid_sns!=null&&d.fmid_sns<0.1?'color:var(--green)':''}">${d.fmid_sns != null ? (d.fmid_sns>=0?'+':'')+d.fmid_sns : '—'}</span></div>
+            <div class="ex-row"><span>课后 PNS</span><span class="val">${d.fpost_pns != null ? (d.fpost_pns>=0?'+':'')+d.fpost_pns : '—'}</span></div>
+            ${d.fmid_dfa ? `<div class="ex-row"><span>课中 DFA α1</span><span class="val" style="${midDfaCol}">${d.fmid_dfa}${d.fmid_dfa>1.0?' ⚠':''}</span></div>` : ''}`;
+        }      } else if (grp.key === 'massage') {
+        // Massage - show D+1,D+2,D+3
+        const d1 = DATA[d._idx+1], d2 = DATA[d._idx+2], d3 = DATA[d._idx+3];
+        rows = `
+          <div class="ex-row"><span>进入 RMSSD</span><span class="val">${d.rs != null ? d.rs+'ms' : '—'}</span></div>
+          <div class="ex-row"><span>D+1 RMSSD</span><span class="val">${d1?.rs ? d1.rs+'ms' : '—'}</span></div>
+          <div class="ex-row"><span>D+2 RMSSD</span><span class="val">${d2?.rs ? d2.rs+'ms' : '—'}</span></div>
+          <div class="ex-row"><span>D+3 RMSSD</span><span class="val" style="color:var(--green);font-weight:600">${d3?.rs ? d3.rs+'ms' : '—'}</span></div>
+          <div class="ex-row"><span>峰值延迟</span><span class="val" style="color:var(--green)">72h</span></div>`;
+      } else {
+        // fascia / other
+        rows = `
+          <div class="ex-row"><span>进入 RMSSD</span><span class="val">${d.rs != null ? d.rs+'ms' : '—'}</span></div>
+          <div class="ex-row"><span>类型</span><span class="val">${d.ex||d.tp}</span></div>`;
+      }
+
+      card.innerHTML = `
+        <div class="ex-card-title" style="border-bottom:2px solid ${borderCol}">
+          <span class="ex-name">${exName}${d.np?' ★':''}</span>
+          <span class="ex-date">${d.d}</span>
+        </div>
+        ${rows}
+        <div class="ex-divider"></div>
+        <div class="ex-row">
+          <span>次日 ΔRMSSD</span>
+          <span class="val" style="font-size:${Math.abs(delta||0)>8?'14':'12'}px;${deltaColor(delta)}">${delta != null ? (delta>0?'+':'')+delta+' ms' : '待测'}</span>
+        </div>
+        ${d.confound ? `<div style="margin-top:6px;padding:6px 8px;background:rgba(181,98,10,.08);border-left:2px solid var(--amber);border-radius:0 4px 4px 0;font-size:10px;color:var(--amber);line-height:1.5;font-family:'DM Mono',monospace">⚠ ${d.confound}</div>` : ''}`;
+      grid.appendChild(card);
+    });
+  });
+})();
+
+// ── Table ─────────────────────────────────────────
+(function buildTable() {
+  const tbody = document.getElementById('data-tbody');
+  DATA.forEach(d => {
+    const tr = document.createElement('tr');
+    const isNP = d.np === true;
+    if (d.cr) tr.className = 'row-crash';
+    else if (isNP) tr.className = 'row-peak';
+    else if (d.ex && d.rs) tr.className = 'row-ex';
+
+    const dhr = d.hs != null && d.hst != null ? d.hst - d.hs : null;
+    const exLabel = d.ex || '—';
+    const rsClass = d.cr ? 'bad' : isNP ? 'good' : d.rs && d.rs < 25 ? 'warn' : '';
+
+    tr.innerHTML = `
+      <td><b>${d.d}</b></td>
+      <td>${exLabel}</td>
+      <td class="${rsClass}">${d.rs != null ? d.rs.toFixed(1) : '—'}</td>
+      <td class="${d.ps != null && d.ps > 0.5 ? 'good' : ''}">${d.ps != null ? (d.ps >= 0 ? '+' : '') + d.ps.toFixed(2) : '—'}</td>
+      <td class="${d.ss != null && d.ss > 0.5 ? 'warn' : ''}">${d.ss != null ? (d.ss >= 0 ? '+' : '') + d.ss.toFixed(2) : '—'}</td>
+      <td>${dhr != null ? (dhr > 0 ? '+' : '') + dhr : '—'}</td>
+      <td class="${d.sst != null && d.sst > 2 ? 'bad' : d.sst != null && d.sst < 0.3 ? 'good' : ''}">${d.sst != null ? (d.sst >= 0 ? '+' : '') + d.sst.toFixed(2) : '—'}</td>
+      <td class="${d.dfa != null && d.dfa > 1.0 ? 'bad' : d.dfa != null && d.dfa < 0.75 ? 'good' : d.dfa != null ? 'warn' : ''}">${d.dfa != null ? d.dfa.toFixed(3) : '—'}</td>
+      <td class="${d.lfhf != null && d.lfhf > 2 ? 'bad' : d.lfhf != null && d.lfhf < 0.5 ? 'good' : ''}">${d.lfhf != null ? d.lfhf.toFixed(3) : '—'}</td>
+      <td class="${d.t && d.t > 100 ? 'warn' : ''}">${d.t != null ? d.t.toFixed(1) : '—'}</td>
+      <td class="${d.maxhr != null && d.maxhr > 130 ? 'bad' : d.maxhr != null && d.maxhr > 120 ? 'warn' : ''}">${d.maxhr != null ? d.maxhr : '—'}</td>
+      <td class="${d.hard != null && d.hard > 5 ? 'bad' : d.hard != null && d.hard > 0 ? 'warn' : ''}">${d.hard != null ? d.hard.toFixed(1)+'%' : '—'}</td>
+      <td class="${d.vt1 != null && d.vt1 > 5 ? 'warn' : ''}">${d.vt1 != null ? d.vt1.toFixed(1)+'%' : '—'}</td>
+      <td class="${d.stress != null && d.stress >= 4 ? 'bad' : d.stress != null && d.stress >= 3 ? 'warn' : ''}">${d.stress != null ? d.stress+'/5' : '—'}</td>
+      <td class="${d.alcohol > 0 ? 'warn' : ''}">${d.alcohol != null && d.alcohol > 0 ? d.alcohol+'杯' : '—'}</td>
+      <td class="${d.valence!=null&&d.valence<=2?'bad':d.valence!=null&&d.valence>=4?'good':''}">${d.valence!=null?d.valence+'/5':'—'}</td>
+      <td class="${d.arousal!=null&&d.arousal>=5?'warn':d.arousal!=null&&d.arousal<=1?'bad':''}">${d.arousal!=null?d.arousal+'/5':'—'}</td>
+      <td class="${d.safety!=null&&d.safety<=2?'bad':d.safety!=null&&d.safety>=4?'good':''}">${d.safety!=null?d.safety+'/5':'—'}</td>
+      <td class="${d.rumination!=null&&d.rumination>=4?'bad':d.rumination!=null&&d.rumination>=2?'warn':''}">${d.rumination!=null?d.rumination+'/5':'—'}</td>
+      <td style="text-align:left;font-family:'DM Sans',sans-serif;font-size:11px;color:#9a9590">${d.note||''}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+})();
+
+// ── Charts ────────────────────────────────────────
+let chart = null;
+const allD = DATA;
+
+// Helper: compute next-day ΔRMSSD for a given index
+function nextDayDelta(data, idx) {
+  const cur = data[idx];
+  // find the next entry that has rs
+  for (let i = idx + 1; i < data.length; i++) {
+    if (data[i].rs != null) return +(data[i].rs - cur.rs).toFixed(1);
+  }
+  return null;
+}
+
+// Color by readiness
+function readyColor(d) {
+  if (!d.rs) return '#9a9590';
+  if (d.cr) return '#b52828';
+  if (d.np) return '#1a1916';
+  if (d.tp === 'squash') return '#b5620a';
+  if (d.tp === 'feld') return '#2d7a4f';
+  if (d.tp === 'massage' || d.tp === 'fascia') return '#d4537e';
+  if (d.tp === 'pilates') return '#1a5fa8';
+  return '#6ab98a';
+}
+
+const chartDefs = {
+  rmssd: {
+    cfg() {
+      const valid = allD.filter(d => d.rs != null);
+      return {
+        type: 'line',
+        data: {
+          labels: valid.map(d => d.d),
+          datasets: [
+            { label:'RMSSD (ms)', data: valid.map(d => d.rs),
+              borderColor:'#2d7a4f', backgroundColor:'rgba(45,122,79,.07)',
+              pointBackgroundColor: valid.map(d => readyColor(d)),
+              pointBorderColor: valid.map(d => readyColor(d)),
+              pointRadius: valid.map(d => d.np?8:d.cr?7:d.tp?6:4),
+              tension:.3, fill:true, spanGaps:true },
+            { label:'7日移动均值', data: valid.map((d,i) => {
+                const w = valid.slice(Math.max(0,i-6), i+1).map(x=>x.rs).filter(x=>x!=null);
+                return w.length ? +(w.reduce((a,b)=>a+b,0)/w.length).toFixed(1) : null;
+              }),
+              borderColor:'#b5620a', borderWidth:2, borderDash:[4,3],
+              pointRadius:0, fill:false, tension:.4, spanGaps:true },
+            { label:'实验峰值 59.0ms', data: valid.map(()=>59.0),
+              borderColor:'rgba(45,122,79,.5)', borderDash:[3,3], pointRadius:0, fill:false },
+            { label:'3/26峰值 56.4ms', data: valid.map(()=>56.4),
+              borderColor:'rgba(45,122,79,.25)', borderDash:[6,4], pointRadius:0, fill:false },
+            { label:'自然峰值 46.1ms', data: valid.map(()=>46.1),
+              borderColor:'rgba(0,0,0,.12)', borderDash:[6,4], pointRadius:0, fill:false }
+          ]
+        },
+        options: { responsive:true, maintainAspectRatio:false,
+          plugins:{ legend:{display:false},
+            tooltip:{ callbacks:{ afterBody: (items) => {
+              const d = valid[items[0].dataIndex];
+              const lines = [];
+              if (d.dfa != null) {
+                const dfaState = d.dfa < 0.75 ? '🟢绿灯' : d.dfa < 1.0 ? '🟡黄灯' : '🔴红灯';
+                lines.push(`DFA α1: ${d.dfa} ${dfaState}`);
+              }
+              if (d.lfhf != null) lines.push(`LF/HF: ${d.lfhf}`);
+              if (d.stress != null) lines.push(`压力: ${d.stress}/5`);
+              if (d.slpQ != null) lines.push(`睡眠质量: ${d.slpQ}/5`);
+              return lines;
+            }}}},
+          scales: { y:{ min:15,max:70, ticks:{font:{size:11}}, grid:{color:'rgba(0,0,0,.06)'} },
+            x:{ ticks:{font:{size:10},maxRotation:40}, grid:{display:false} } }
+        }
+      };
+    }
+  },
+  pns: {
+    cfg() {
+      const h = allD.filter(d => d.ss != null);
+      return {
+        type:'bar',
+        data: { labels: h.map(d=>d.d), datasets:[
+          { label:'PNS index', data:h.map(d=>d.ps),
+            backgroundColor: h.map(d=>d.cr?'#e06060':d.np?'#1a1916':d.ps>=0?'#6ab98a':'#f5c06a'), borderRadius:3 },
+          { label:'SNS index', data:h.map(d=>d.ss),
+            backgroundColor: h.map(d=>d.ss<=0?'#a8c8f0':'#f5c06a'), borderRadius:3 }
+        ]},
+        options:{ responsive:true, maintainAspectRatio:false,
+          plugins:{legend:{display:false}},
+          scales:{ y:{ticks:{font:{size:11}},grid:{color:'rgba(0,0,0,.06)'}},
+            x:{ticks:{font:{size:10},maxRotation:40},grid:{display:false}} } }
+      };
+    }
+  },
+  ortho: {
+    cfg() {
+      const h = allD.filter(d => d.hs!=null && d.hst!=null);
+      return {
+        type:'bar',
+        data:{ labels:h.map(d=>d.d), datasets:[
+          { label:'ΔHR 立−卧 (bpm)', data:h.map(d=>d.hst-d.hs),
+            backgroundColor:'#a8c8f0', borderRadius:3 },
+          { label:'站立 SNS', data:h.map(d=>d.sst),
+            backgroundColor:h.map(d=>d.sst>2?'#e06060':d.sst>1?'#f5c06a':'#6ab98a'), borderRadius:3 }
+        ]},
+        options:{ responsive:true, maintainAspectRatio:false,
+          plugins:{legend:{display:false}},
+          scales:{ y:{ticks:{font:{size:11}},grid:{color:'rgba(0,0,0,.06)'}},
+            x:{ticks:{font:{size:10},maxRotation:40},grid:{display:false}} } }
+      };
+    }
+  },
+  dose: {
+    cfg() {
+      // Dynamic: all sessions that have a training type with rs on that day
+      const sessions = allD.map((d,i) => ({...d, idx:i}))
+        .filter(d => d.tp && d.tp !== '' && (d.tp !== 'massage'));
+      const labels = sessions.map(d => {
+        const tpShort = {pilates:'P',feld:'F',squash:'壁球',group:'团课',fascia:'筋膜/针灸'}[d.tp]||d.tp;
+        return `${tpShort}\n${d.d}`;
+      });
+      const deltas = sessions.map((d,i) => nextDayDelta(allD, d.idx));
+      const preRmssd = sessions.map(d => d.rs);
+      const barColors = sessions.map(d => {
+        if (d.cr) return '#b52828';
+        if (!deltas[sessions.indexOf(d)] && deltas[sessions.indexOf(d)] !== 0) return '#ccc';
+        const delta = deltas[sessions.indexOf(d)];
+        return delta > 3 ? '#2d7a4f' : delta > 0 ? '#6ab98a' : delta > -5 ? '#f5c06a' : '#e06060';
+      });
+      return {
+        type:'bar',
+        data:{ labels, datasets:[
+          { label:'次日 ΔRMSSD (ms)', data:deltas,
+            backgroundColor:barColors, borderRadius:4, yAxisID:'y' },
+          { label:'训练前 RMSSD', data:preRmssd,
+            backgroundColor:'rgba(168,200,240,.5)', borderRadius:4, yAxisID:'y2' }
+        ]},
+        options:{ responsive:true, maintainAspectRatio:false,
+          plugins:{legend:{display:false}},
+          scales:{
+            y:{ ticks:{font:{size:11}}, title:{display:true,text:'ΔRMSSD (ms)',font:{size:10}},
+              grid:{color:'rgba(0,0,0,.06)'} },
+            y2:{ position:'right', min:0, max:65, ticks:{font:{size:11}},
+              grid:{display:false}, title:{display:true,text:'训练前 RMSSD',font:{size:10}} },
+            x:{ ticks:{font:{size:9},maxRotation:45}, grid:{display:false} }
+          }
+        }
+      };
+    }
+  },
+  intensity: {
+    cfg() {
+      // Sessions with MaxHR data — scatter: x=MaxHR, y=nextDay ΔRMSSD, size=TRIMP
+      const sessions = allD.map((d,i)=>({...d,idx:i}))
+        .filter(d => d.maxhr != null);
+      const points = sessions.map((d,i) => ({
+        x: d.maxhr,
+        y: nextDayDelta(allD, d.idx),
+        r: Math.min(Math.sqrt((d.t||30))*1.4, 28),
+        label: d.ex||d.tp,
+        date: d.d,
+        trimp: d.t,
+        hard: d.hard,
+        vt1: d.vt1,
+        cr: d.cr
+      })).filter(p => p.y !== null);
+      // Compute y range with padding for bubble radius
+      const yVals = points.map(p=>p.y);
+      const yMin = Math.floor(Math.min(...yVals) - 5);
+      const yMax = Math.ceil(Math.max(...yVals) + 5);
+      const xMax = Math.ceil(Math.max(...points.map(p=>p.x)) / 5) * 5 + 5;
+      return {
+        type:'bubble',
+        data:{ datasets:[{
+          label:'训练会话',
+          data: points,
+          backgroundColor: points.map(p => p.cr?'rgba(181,40,40,.5)':
+            p.x>130?'rgba(181,40,40,.6)':p.x>120?'rgba(181,98,10,.6)':'rgba(26,95,168,.6)'),
+          borderColor: points.map(p => p.cr?'#b52828':p.x>130?'#b52828':p.x>120?'#b5620a':'#1a5fa8'),
+          borderWidth:1.5
+        }]},
+        options:{ responsive:true, maintainAspectRatio:false,
+          plugins:{ legend:{display:false},
+            tooltip:{ callbacks:{ label: (item) => {
+              const p = points[item.dataIndex];
+              return [`${p.label} (${p.date})`,
+                `MaxHR: ${p.x}bpm  ΔRMSSD: ${p.y>0?'+':''}${p.y}ms`,
+                `TRIMP: ${p.trimp||'—'}  Hard: ${p.hard!=null?p.hard+'%':'—'}  VT1: ${p.vt1!=null?p.vt1+'%':'—'}`];
+            }}}},
+          scales:{
+            x:{ title:{display:true,text:'MaxHR (bpm)',font:{size:11}},
+              min:100, max:xMax,
+              grid:{color:'rgba(0,0,0,.06)'},
+              ticks:{font:{size:10}},
+              afterDraw(chart) {
+                const ctx = chart.ctx;
+                const xScale = chart.scales.x;
+                [125,130].forEach(v => {
+                  const px = xScale.getPixelForValue(v);
+                  ctx.save();
+                  ctx.strokeStyle = 'rgba(181,40,40,.4)';
+                  ctx.setLineDash([4,4]);
+                  ctx.beginPath();
+                  ctx.moveTo(px, chart.chartArea.top);
+                  ctx.lineTo(px, chart.chartArea.bottom);
+                  ctx.stroke();
+                  ctx.restore();
+                });
+              }
+            },
+            y:{ min:yMin, max:yMax, title:{display:true,text:'次日 ΔRMSSD (ms)',font:{size:11}},
+              grid:{color:'rgba(0,0,0,.06)'}, ticks:{font:{size:10}} }
+          }
+        }
+      };
+    }
+  },
+  extype: {
+    cfg() {
+      // Per-type: collect all sessions with next-day delta
+      const typeConfig = {
+        pilates: { label:'普拉提私教', color:'#1a5fa8' },
+        group:   { label:'普拉提团课', color:'#888780' },
+        squash:  { label:'壁球',       color:'#b5620a' },
+        yoga:    { label:'瑜伽+冥想',  color:'#2d7a4f' },
+        feld:    { label:'Feldenkrais',color:'#0f8c5a' },
+        massage: { label:'按摩',       color:'#d4537e' },
+        fascia:  { label:'针灸·筋膜',  color:'#6b3fa0' },
+        travel:  { label:'旅行',       color:'#1a7a6e' },
+      };
+
+      // Collect all sessions with next-day delta, grouped by type
+      const sessions = allD.map((d,i) => ({...d, _idx:i}))
+        .filter(d => d.tp && d.tp !== '' && d.rs != null);
+
+      // Compute next-day delta for each
+      const withDelta = sessions.map(d => {
+        const delta = nextDayDelta(allD, d._idx);
+        return {...d, delta};
+      }).filter(d => d.delta !== null && !d.cr);
+
+      // Group by type, compute mean delta and individual points
+      const types = Object.keys(typeConfig).filter(tp =>
+        withDelta.some(d => d.tp === tp || (tp === 'yoga' && d.tp === 'yoga'))
+      );
+
+      // Dataset 1: Box-like bar chart — mean delta per type
+      const meanDeltas = types.map(tp => {
+        const vals = withDelta.filter(d => d.tp === tp).map(d => d.delta);
+        return vals.length ? +(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1) : null;
+      });
+      const counts = types.map(tp => withDelta.filter(d => d.tp === tp).length);
+
+      // Dataset 2: Chronological RMSSD trend (line overlay on right axis)
+      const chronological = allD.filter(d => d.rs != null && !d.cr);
+
+      return {
+        type: 'bar',
+        data: {
+          labels: types.map(tp => `${typeConfig[tp].label}\n(N=${counts[types.indexOf(tp)]})`),
+          datasets: [
+            {
+              label: '平均次日 ΔRMSSD (ms)',
+              data: meanDeltas,
+              backgroundColor: types.map(tp =>
+                (meanDeltas[types.indexOf(tp)]||0) > 0
+                  ? typeConfig[tp].color + 'cc'
+                  : '#e0606080'
+              ),
+              borderColor: types.map(tp => typeConfig[tp].color),
+              borderWidth: 1.5,
+              borderRadius: 4,
+              yAxisID: 'y',
+            }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { afterBody: (items) => {
+              const tp = types[items[0].dataIndex];
+              const vals = withDelta.filter(d => d.tp === tp).map(d =>
+                `${d.d}: ${d.delta > 0 ? '+' : ''}${d.delta}ms`
+              );
+              return ['', '各次数据：', ...vals];
+            }}}
+          },
+          scales: {
+            y: {
+              title: { display: true, text: '平均次日 ΔRMSSD (ms)', font: { size: 10 } },
+              grid: { color: 'rgba(0,0,0,.06)' },
+              ticks: { font: { size: 10 } }
+            },
+            x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+          }
+        }
+      };
+    }
+  },
+  emotion: {
+    cfg() {
+      const h = allD.filter(d => d.rs != null && (d.valence!=null||d.safety!=null||d.arousal!=null));
+      if (!h.length) return {
+        type:'bar', data:{labels:['暂无情绪数据'],datasets:[{data:[0],backgroundColor:'#eee'}]},
+        options:{plugins:{legend:{display:false}},scales:{y:{display:false},x:{ticks:{font:{size:11}}}}}
+      };
+      return {
+        type:'bar',
+        data:{ labels: h.map(d=>d.d), datasets:[
+          { label:'RMSSD (ms÷10)', data: h.map(d=>+(d.rs/10).toFixed(1)),
+            backgroundColor:'rgba(45,122,79,.25)', borderColor:'#2d7a4f',
+            borderWidth:1.5, borderRadius:3, yAxisID:'y' },
+          { label:'情绪效价 /5', data: h.map(d=>d.valence??null),
+            type:'line', borderColor:'#6b3fa0', backgroundColor:'transparent',
+            pointRadius:5, pointBackgroundColor:'#6b3fa0', tension:.3, yAxisID:'y2' },
+          { label:'安全感 /5', data: h.map(d=>d.safety??null),
+            type:'line', borderColor:'#1a7a6e', backgroundColor:'transparent',
+            pointRadius:4, pointBackgroundColor:'#1a7a6e',
+            borderDash:[4,3], tension:.3, yAxisID:'y2' },
+          { label:'唤醒度 /5', data: h.map(d=>d.arousal??null),
+            type:'line', borderColor:'#b5620a', backgroundColor:'transparent',
+            pointRadius:4, pointBackgroundColor:'#b5620a',
+            borderDash:[2,3], tension:.3, yAxisID:'y2' },
+        ]},
+        options:{ responsive:true, maintainAspectRatio:false,
+          plugins:{ legend:{ display:true, position:'top', labels:{font:{size:10},boxWidth:10} } },
+          scales:{
+            y:{ min:0, max:7, ticks:{font:{size:10}},
+              title:{display:true,text:'RMSSD÷10',font:{size:9}},
+              grid:{color:'rgba(0,0,0,.05)'} },
+            y2:{ position:'right', min:0, max:5.5,
+              ticks:{font:{size:10},stepSize:1},
+              title:{display:true,text:'情绪评分 /5',font:{size:9}},
+              grid:{display:false} },
+            x:{ ticks:{font:{size:10},maxRotation:40}, grid:{display:false} }
+          }
+        }
+      };
+    }
+  }
+};
+
+function switchChart(key, btn) {
+  document.querySelectorAll('.ctab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  if (chart) { chart.destroy(); chart = null; }
+  chart = new Chart(document.getElementById('mainChart'), chartDefs[key].cfg());
+}
+switchChart('rmssd', document.querySelector('.ctab.active'));
+
+
+</script>
+</body>
+</html>
